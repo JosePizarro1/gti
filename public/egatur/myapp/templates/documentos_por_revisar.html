@@ -1,0 +1,163 @@
+<!-- documentos_por_revisar.html -->
+
+<style>
+    .estado-denegado {
+        color: white;
+        background-color: #c82333;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .estado-aprobado {
+        color: white;
+        background-color: #28a745;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .estado-pendiente {
+        color: white;
+        background-color: #ffc107;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .action-icons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .action-icons i {
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    .btn-approve {
+        color: #28a745;
+    }
+    .btn-approve:hover {
+        color: #218838;
+    }
+    .btn-deny {
+        color: #c82333;
+    }
+    .btn-deny:hover {
+        color: #bd2130;
+    }
+    .modal-content {
+        background-color: #f8f9fa;
+        color: #343a40;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.5em 1em;
+        border-radius: 0.3em;
+        border: 1px solid #ddd;
+        margin: 0 0.1em;
+    }
+</style>
+
+<div class="overflow-x-auto">
+    <table id="documentosPorRevisarTable" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Tipo</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Fecha de Emisión</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Estado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for documento in documentos_por_revisar %}
+                {% if documento.estado == 'PENDIENTE' %}
+                    <tr class="hover:bg-gray-50" data-tipo="{{ documento.tipo }}" data-estado="{{ documento.estado }}">
+                        <td class="px-4 py-2 whitespace-nowrap">{{ documento.usuario.username }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ documento.tipo }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap">{{ documento.fecha_emision }}</td>
+                        <td>
+                            <span class="inline-block text-white bg-yellow-500 px-2 py-1 rounded font-semibold text-sm">{{ documento.estado }}</span>
+                        </td>
+                        <td class="action-icons">
+                            <i class="fas fa-check btn-approve" title="Aprobar" data-id="{{ documento.id }}" data-toggle="modal" data-target="#aprobarModal"></i>
+                            <i class="fas fa-times btn-deny" title="Denegar" data-id="{{ documento.id }}" data-toggle="modal" data-target="#denegarModal"></i>
+                            <a href="{{ documento.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800" title="Ver Archivo">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="px-4 py-2 text-center text-gray-500">No se encontraron documentos</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modales (Aprobar y Denegar) -->
+<div class="modal fade" id="aprobarModal" tabindex="-1" aria-labelledby="aprobarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="aprobarModalLabel">Visar Documento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'visar_documento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="documento_id" id="aprobarDocumentoId">
+                    <button type="submit" class="btn btn-primary">Aprobar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="denegarModal" tabindex="-1" aria-labelledby="denegarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="denegarModalLabel">Denegar Documento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'rechazar_documento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="documento_id" id="denegarDocumentoId">
+                    <button type="submit" class="btn btn-danger">Denegar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        var table = $('#documentosPorRevisarTable').DataTable({
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+            },
+            "dom": '<"flex justify-between items-center mb-2"<"block sm:inline"l><"block sm:inline"f>>rt<"flex justify-between items-center mt-2"<"block sm:inline"i><"block sm:inline"p>>',
+            "pagingType": "simple_numbers",
+            "pageLength": 5,
+        });
+
+        // Mostrar contenido del ID en los modales
+        $('#aprobarModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var modal = $(this);
+            modal.find('#aprobarDocumentoId').val(id);
+        });
+
+        $('#denegarModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var modal = $(this);
+            modal.find('#denegarDocumentoId').val(id);
+        });
+    });
+</script>

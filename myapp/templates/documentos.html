@@ -1,0 +1,345 @@
+<!-- documentos.html -->
+<style>
+    .dataTables_info {
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    margin-bottom: 0.5rem; /* Agrega espacio abajo para separar de los botones */
+}
+
+.dataTables_paginate {
+    margin-top: 0.5rem; /* Agrega margen superior para que no se superponga */
+}
+
+@media (max-width: 768px) {
+    .dataTables_info {
+        font-size: 0.85rem; /* Reduce el tamaño en pantallas pequeñas */
+    }
+}
+
+</style>
+<div class="mb-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+            <label for="tipoFiltro" class="block text-gray-700 font-semibold">Filtrar por Tipo</label>
+            <select id="tipoFiltro" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">Todos</option>
+                <option value="FUT">FUT</option>
+                <option value="REQ">REQ</option>
+                <option value="INF">Informe</option>
+            </select>
+        </div>
+        <div>
+            <label for="estadoFiltro" class="block text-gray-700 font-semibold">Filtrar por Estado</label>
+            <select id="estadoFiltro" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">Todos</option>
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="APROBADO">Aprobado</option>
+                <option value="DENEGADO">Denegado</option>
+            </select>
+        </div>
+        <div>
+            <label for="pagadoFiltro" class="block text-gray-700 font-semibold">Filtrar por Pagado</label>
+            <select id="pagadoFiltro" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">Todos</option>
+                <option value="True">Pagado</option>
+                <option value="False">No Pagado</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="overflow-x-auto">
+    <table id="documentosTable" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">ID</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Tipo</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Asunto</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Fecha de Emisión</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Estado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Pagado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Visado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for documento in documentos %}
+                <tr class="hover:bg-gray-50" data-tipo="{{ documento.tipo }}" data-estado="{{ documento.estado }}" data-pagado="{{ documento.pagado }}">
+                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.id }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.usuario.get_full_name }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.tipo }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.asunto }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.fecha_emision|date:"d/m/Y H:i" }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">
+                        {% if documento.estado == 'DENEGADO' %}
+                            <span class="inline-block text-white bg-red-600 px-2 py-1 rounded font-semibold text-sm">{{ documento.estado }}</span>
+                        {% elif documento.estado == 'APROBADO' %}
+                            <span class="inline-block text-white bg-green-600 px-2 py-1 rounded font-semibold text-sm">{{ documento.estado }}</span>
+                        {% else %}
+                            <span class="inline-block text-white bg-yellow-500 px-2 py-1 rounded font-semibold text-sm">{{ documento.estado }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                        {% if documento.pagado %}
+                            <i class="fas fa-check text-green-600"></i>
+                        {% else %}
+                            <i class="fas fa-times text-red-600"></i>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                        {% if documento.visado %}
+                            <i class="fas fa-check text-green-600"></i>
+                        {% else %}
+                            <i class="fas fa-times text-red-600"></i>
+                        {% endif %}
+                    </td>
+                    <td class="action-icons text-center align-middle">
+                    {% if documento.rendicion %}
+                        {% if documento.archivo_rendicion %}
+                            <!-- Ojo rojo para ver el documento -->
+                            <a href="{{ documento.archivo_rendicion.url }}" target="_blank">
+                                <i class="fas fa-eye text-red-600 cursor-pointer" title="Ver documento"></i>
+                            </a>
+                        {% else %}
+                            <!-- Ojo deshabilitado si no hay archivo -->
+                            <i class="fas fa-eye-slash text-gray-400" title="Documento no disponible"></i>
+                        {% endif %}
+                    {% elif documento.tipo == 'REQ' and documento.estado == 'APROBADO' %}
+                        <!-- Icono para subir PDF -->
+                        <i class="fas fa-upload text-red-600 cursor-pointer" title="Subir a Tesorería" 
+                           data-id="{{ documento.id }}" data-toggle="modal" data-target="#subirPdfModal"></i>
+                    {% endif %}
+
+                        
+                        
+                        {% if documento.estado == 'DENEGADO' %}
+                            <a href="{{ documento.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800" title="Ver Archivo">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <i class="fas fa-check text-green-600 cursor-pointer" title="Subsanar" data-id="{{ documento.id }}" data-toggle="modal" data-target="#subsanarModal"></i>
+                            <i class="fas fa-exclamation-circle text-red-600 cursor-pointer" title="Ver Observación" data-id="{{ documento.id }}" data-observacion="{{ documento.observacion }}" data-toggle="modal" data-target="#observacionModal"></i>
+                        {% elif documento.estado == 'PENDIENTE' %}
+                            <a href="{{ documento.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800" title="Ver Archivo">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        {% elif documento.estado == 'APROBADO' and documento.archivo_firmado %}
+                            <a href="{{ documento.archivo_firmado.url }}" class="text-green-600 hover:text-green-800" title="Descargar Archivo" download>
+                                <i class="fas fa-download"></i>
+                            </a>
+                        {% endif %}
+                                                                        <!-- Mostrar Fechas -->
+                        <button class="btn btn-info btn-sm text-white shadow-none border-0" title="Ver Fechas"
+                                    onclick="mostrarFechas('{{ documento.fecha_recepcion }}', '{{ documento.fecha_emision }}')">
+                                <i class="fas fa-calendar-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9" class="px-4 py-2 text-center text-gray-500">No se encontraron documentos</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800" onclick="window.location.href='{% url 'subir_documento' %}'">Subir Documento</button>
+</div>
+
+<!-- Modal para subir PDF -->
+<div class="modal fade" id="subirPdfModal" tabindex="-1" aria-labelledby="subirPdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white shadow rounded-lg">
+            <div class="modal-header border-b">
+                <h5 class="modal-title text-gray-800 font-semibold" id="subirPdfModalLabel">Mandar Rendición a Tesorería</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="subirPdfForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="documento_id" id="subirPdfDocumentoId">
+                    
+                    <div class="form-group">
+                        <label for="archivo_pdf" class="text-gray-700">Seleccionar Archivo (PDF)</label>
+                        <input type="file" class="form-input mt-1 block w-full" id="archivo_pdf" name="archivo_rendicion" accept="application/pdf" required>
+                    </div>
+                    
+                    <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">Enviar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modales (Subsanar y Observación) -->
+<div class="modal fade" id="subsanarModal" tabindex="-1" aria-labelledby="subsanarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white shadow rounded-lg">
+            <div class="modal-header border-b">
+                <h5 class="modal-title text-gray-800 font-semibold" id="subsanarModalLabel">Subsanar Documento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data" action="{% url 'subsanar_documento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="documento_id" id="subsanarDocumentoId">
+                    <div class="form-group">
+                        <label for="archivo_nuevo" class="text-gray-700">Nuevo Archivo</label>
+                        <input type="file" class="form-input mt-1 block w-full" id="archivo_nuevo" name="archivo_nuevo" required>
+                    </div>
+                    <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">Subsanar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="observacionModal" tabindex="-1" aria-labelledby="observacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white shadow rounded-lg">
+            <div class="modal-header border-b">
+                <h5 class="modal-title text-gray-800 font-semibold" id="observacionModalLabel">Observación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="observacionText" class="text-gray-600"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+    var table = $('#documentosTable').DataTable({
+        "language": {
+            "url": "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+        },
+        "order": [[0, "desc"]],
+        "dom": '<"flex justify-between items-center mb-2"<"block sm:inline"l><"block sm:inline"f>>rt<"flex justify-between items-center mt-2 space-x-2"<"block sm:inline"i><"block sm:inline"p>>',
+        "pagingType": "simple_numbers",
+        "pageLength": 5,
+        "initComplete": function () {
+            var api = this.api();
+    
+            // Manejo de filtros
+            $('#tipoFiltro, #estadoFiltro, #pagadoFiltro').on('change', function () {
+                api.draw(); // Redibujar la tabla después de aplicar los filtros
+            });
+        }
+    });
+
+
+    $.fn.dataTable.ext.search.push(
+        function (settings, data, dataIndex) {
+            var tipoFiltro = $('#tipoFiltro').val();
+            var estadoFiltro = $('#estadoFiltro').val();
+            var pagadoFiltro = $('#pagadoFiltro').val();
+    
+            var rowTipo = data[2]; // Índice de la columna "Tipo"
+            var rowEstado = data[5]; // Índice de la columna "Estado"
+            var rowPagado = data[6]; // Índice de la columna "Pagado"
+    
+            var cumpleFiltro =
+                (tipoFiltro === '' || rowTipo === tipoFiltro) &&
+                (estadoFiltro === '' || rowEstado === estadoFiltro) &&
+                (pagadoFiltro === '' || rowPagado.toLowerCase() === (pagadoFiltro === 'True' ? 'pagado' : 'no pagado'));
+    
+            return cumpleFiltro;
+        }
+    );
+    
+    // Redibujar la tabla cuando cambien los filtros
+    $('#tipoFiltro, #estadoFiltro, #pagadoFiltro').on('change', function () {
+        table.draw();
+    });
+
+    });
+    function mostrarFechas(fechaRecepcion, fechaEmision) {
+        Swal.fire({
+            title: 'Detalles de Fechas',
+            html: `
+                <div style="text-align: center; font-size: 18px; line-height: 1.6;">
+                    <p><strong>📅 Fecha de Recepcion:</strong><br> ${fechaRecepcion ? fechaRecepcion : 'No disponible'}</p>
+                    <p><strong>📄 Fecha de Emision:</strong><br> ${fechaEmision ? fechaEmision : 'No disponible'}</p>
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonText: 'Cerrar'
+        });
+    }
+    $('#subirPdfModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var documentoId = button.data('id');
+        $('#subirPdfDocumentoId').val(documentoId);
+    });
+
+document.getElementById("subirPdfForm").addEventListener("submit", function(event) {
+    event.preventDefault();  // Evita el envío normal del formulario
+
+    let documentoIdInput = document.getElementById("subirPdfDocumentoId");
+    let archivoInput = document.getElementById("archivo_pdf");
+
+    // Verificar que los campos tengan valores antes de enviar
+    if (!documentoIdInput.value) {
+        Swal.fire("Error", "No se ha especificado el documento ID.", "error");
+        return;
+    }
+
+    if (!archivoInput.files.length) {
+        Swal.fire("Error", "Debe seleccionar un archivo PDF.", "error");
+        return;
+    }
+
+    let formData = new FormData(this);
+    formData.append("documento_id", documentoIdInput.value);
+
+    Swal.fire({
+        title: "¿Está seguro?",
+        text: "Desea enviar este documento a Tesorería",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, enviar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch("{% url 'enviar_a_tesoreria' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"  // Agregar el token CSRF
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    Swal.fire("Error", data.error, "error");
+                } else {
+                    Swal.fire("Enviado", data.mensaje, "success").then(() => {
+                        location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error en la petición:", error);
+                Swal.fire("Error", "No se pudo enviar el documento.", "error");
+            });
+        }
+    });
+});
+ 
+    $('#subsanarModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var documentoId = button.data('id');
+        $('#subsanarDocumentoId').val(documentoId);
+    });
+
+    $('#observacionModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var observacion = button.data('observacion');
+        $('#observacionText').text(observacion);
+    });
+</script>

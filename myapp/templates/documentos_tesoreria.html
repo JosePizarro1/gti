@@ -1,0 +1,398 @@
+<style>
+    .group:hover .group-hover\\:block {
+    display: block;
+}
+
+.group-hover\\:block {
+    display: none;
+}
+
+.relative .absolute {
+    position: absolute;
+    white-space: normal; /* Para evitar que el texto se corte */
+    max-width: 300px; /* Ajusta el ancho del tooltip */
+    z-index: 10; /* Para asegurarte de que esté por encima de otros elementos */
+}
+
+</style>
+<style>
+    /* Limitar el ancho de la columna de Asunto y ajustar el texto */
+    #documentosTable td:nth-child(6) {
+        max-width: 200px; /* Ajusta este valor según el ancho que desees */
+        overflow: hidden;  /* Ocultar cualquier texto que sobrepase el máximo */
+        text-overflow: ellipsis; /* Añadir '...' si el texto es demasiado largo */
+        white-space: normal;  /* Permitir que el texto se divida en varias líneas */
+    }
+        #documentosTable td:nth-child(2) {
+        max-width: 80px; /* Ajusta este valor según el ancho que desees */
+        overflow: hidden;  /* Ocultar cualquier texto que sobrepase el máximo */
+        text-overflow: ellipsis; /* Añadir '...' si el texto es demasiado largo */
+        white-space: normal;  /* Permitir que el texto se divida en varias líneas */
+    }
+    #documentosTable tbody tr {
+    border-bottom: 1px solid #d1d5db;
+}
+#documentosTable tbody td {
+    border-bottom: 1px solid #d1d5db; /* Color gris claro */
+}
+@keyframes fadeZoom {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-pulse {
+    animation: fadeZoom 1.5s infinite alternate;
+}
+
+</style>
+
+<div class="container mt-5">
+    <!-- Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <select id="filtroSede" class="form-control">
+                <option value="">Filtrar por Sede</option>
+                <option value="EGATUR">Egatur</option>
+                <option value="FOCUS">Focus</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="filtroPagado" class="form-control">
+                <option value="">Filtrar por Estado de Pago</option>
+                <option value="pagado">Pagado</option>
+                <option value="no-pagado">No Pagado</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="filtroTipo" class="form-control">
+                <option value="">Filtrar por Tipo</option>
+                {% for tipo in tipos %}
+                    <option value="{{ tipo }}">{{ tipo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="filtroArea" class="form-control">
+                <option value="">Filtrar por Área</option>
+                {% for area in areas %}
+                    <option value="{{ area }}">{{ area }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 mt-3">
+    <button id="buscarFiltros" class="btn btn-primary btn-block">Buscar</button>
+        </div>
+
+    </div>
+
+
+    <div class="overflow-x-auto">
+        <table id="documentosTable" class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+            <thead class="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Id</th>
+    
+                    <th class="px-3 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Usuario</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Tipo</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Area</th>
+
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Sede</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Asunto</th>
+
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Pago</th>
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Rendido</th>
+
+                    <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+            {% for documento in documentos_aprobados %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-300 dark:border-gray-700" 
+                        data-sede="{{ documento.usuario.roles.sede }}" 
+                        data-pagado="{% if documento.pagado %}pagado{% else %}no-pagado{% endif %}" 
+                        data-tipo="{{ documento.tipo }}" 
+                        data-area="{{ documento.usuario.roles.area }}">
+
+            
+                    <!-- Usuario -->
+                    <td class="px-2 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ documento.id }}</td>
+                    <!-- Usuario -->
+                    <td class="px-2 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ documento.usuario.get_full_name }}</td>
+    
+                    <!-- Tipo -->
+                    <td class="px-2 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ documento.tipo }}</td>
+                        <td class="px-2 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200">{{ documento.usuario.roles.get_area_display }}</td>
+
+                    <!-- Sede -->
+                    <td class="px-2 py-2">
+                        <span class="inline-block px-3 py-1 rounded-full text-sm font-medium 
+                            {% if documento.usuario.roles.sede == 'EGATUR' %} 
+                                bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-300
+                            {% else %}
+                                bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-300
+                            {% endif %}">
+                            {{ documento.usuario.roles.get_sede_display }}
+                        </span>
+                    </td>
+    
+                    <!-- Fecha de Emisión -->
+                    <td class="px-4 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200">
+                        <div class="flex flex-col">
+                            <!-- Primera fila con las primeras 15 palabras -->
+                            <span class="block">
+                                {{ documento.asunto}}
+                            </span>
+
+                        </div>
+                    </td>
+                    <!-- Estado de Pago -->
+                    <td class="px-2 py-2 text-center">
+                        {% if documento.pagado %}
+                            <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-2xl"></i>
+                        <!-- Icono de Observación -->
+                        {% if documento.observacion %}
+                            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 cursor-pointer text-2xl" 
+                               title="Ver Observación" 
+                               onclick="showObservationModal('{{ documento.observacion|escapejs }}')">
+                            </i>
+                        {% endif %}
+
+                        {% else %}
+                            <i class="fas fa-times-circle text-red-600 dark:text-red-400 text-2xl"></i>
+                        {% endif %}
+                    </td>
+                    <td class="px-2 py-2 text-center">
+                    {% if documento.rendicion %}
+                        {% if documento.archivo_rendicion %}
+                            <!-- Ojo verde para ver el documento con animación -->
+                            <a href="{{ documento.archivo_rendicion.url }}" target="_blank">
+                                <i class="fas fa-eye text-green-600 text-2xl cursor-pointer animate-pulse transition-transform duration-300 hover:scale-110" title="Ver documento"></i>
+                            </a>
+                        {% else %}
+                            <!-- Ojo deshabilitado si no hay archivo -->
+                            <i class="fas fa-eye-slash text-gray-400 text-2xl" title="Documento no disponible"></i>
+                        {% endif %}
+                    {% else %}
+                        <!-- X roja si no está rendido -->
+                        <i class="fas fa-times-circle text-red-600 dark:text-red-400 text-2xl" title="Documento No Rendido (Sin Archivo)"></i>
+                    {% endif %}
+
+                    
+                    </td>
+
+
+
+                    <!-- Acciones -->
+                    <td class="px-2 py-2 text-center">
+                        {% if documento.archivo_firmado %}
+                            <a href="{{ documento.archivo_firmado.url }}" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-600" title="Descargar Archivo" download>
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <a href="{{ documento.archivo_firmado.url }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-600" title="Ver Archivo" target="_blank">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        {% endif %}
+                        {% if not documento.pagado %}
+                            <button class="text-yellow-500 hover:text-yellow-700 dark:text-yellow-300 dark:hover:text-yellow-500" onclick="confirmPayment({{ documento.id }})" title="Pagar Documento">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </button>
+                        {% endif %}
+                        {% if documento.rendicion is False and documento.pagado %}
+                            <button class="text-purple-500 hover:text-purple-700 dark:text-purple-300 dark:hover:text-purple-500" onclick="confirmRendicion({{ documento.id }})" title="Rendir Documento">
+                                <i class="fas fa-clipboard-check"></i>
+                            </button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    
+</div>
+<!-- Modal para mostrar la observación -->
+<div class="modal fade" id="observationModal" tabindex="-1" role="dialog" aria-labelledby="observationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="observationModalLabel">Observación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="observationText"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        
+                {% if messages %}
+            {% for message in messages %}
+                var messageType = "{{ message.tags }}"; // Puede ser 'success', 'error', etc.
+                var messageText = "{{ message }}"; // El texto del mensaje
+
+                if (messageType == 'success') {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: messageText,
+                        icon: 'success',
+                        confirmButtonText: 'Cerrar'
+                    });
+                } else if (messageType == 'error') {
+                    Swal.fire({
+                        title: 'Error',
+                        text: messageText,
+                        icon: 'error',
+                        confirmButtonText: 'Cerrar'
+                    });
+                }
+            {% endfor %}
+        {% endif %}
+        var table = $('#documentosTable').DataTable({
+        "language": {
+            "search": "Buscar:",
+            "paginate": {
+                "next": "Siguiente",
+                "previous": "Anterior"
+            },
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+            "infoEmpty": "No hay entradas para mostrar",
+            "infoFiltered": "(filtrado de _MAX_ entradas en total)",
+            "lengthMenu": "Mostrar _MENU_ entradas",
+            "zeroRecords": "No se encontraron registros",
+            "emptyTable": "No hay datos disponibles en la tabla",
+            "loadingRecords": "Cargando...",
+            "processing": "Procesando...",
+            "searchPlaceholder": "Buscar..."
+        },
+    "ordering": false, // Deshabilitar la ordenación en todas las columnas
+
+        "pageLength": 25 // Mostrar 25 filas por defecto
+    });
+
+    $('#buscarFiltros').on('click', function () {
+        var sede = $('#filtroSede').val();
+        var pagado = $('#filtroPagado').val();
+        var tipo = $('#filtroTipo').val();
+        var area = $('#filtroArea').val();
+
+        // Construir la URL con los filtros seleccionados
+        var queryParams = {};
+        if (sede) queryParams.sede = sede;
+        if (pagado) queryParams.pagado = pagado;
+        if (tipo) queryParams.tipo = tipo;
+        if (area) queryParams.area = area;
+
+        // Convertir los parámetros a una cadena de consulta
+        var queryString = $.param(queryParams);
+
+        // Redirigir con los parámetros
+        var baseUrl = window.location.origin + window.location.pathname;
+        window.location.href = baseUrl + '?' + queryString;
+    });
+        
+        
+        
+    });
+    
+    
+    function showObservationModal(observacion) {
+    Swal.fire({
+        title: 'Observación',
+        text: observacion,
+        icon: 'info',
+        confirmButtonText: 'Cerrar',
+    });
+}
+
+
+    function showObservationModal(observacion) {
+    $('#observationText').text(observacion); // Establecer el texto de la observación en el modal
+    $('#observationModal').modal('show'); // Mostrar el modal
+}
+    function confirmPayment(documentId) {
+    Swal.fire({
+        title: 'Confirmar Pago',
+        text: '¿Estás seguro de que deseas marcar este documento como pagado?',
+        icon: 'warning',
+        input: 'textarea',
+        inputPlaceholder: 'Escribe una observación (opcional)',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, confirmar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var observacion = result.value || '';  // Guardar la observación
+            // Construir la URL con la observación y el documento_id
+            var url = "{% url 'marcar_pagado' 0 %}".replace('0', documentId);
+            // Enviar el formulario con la observación usando AJAX
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'observacion': observacion,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'  // Asegurar que el token CSRF esté presente
+                },
+                success: function(response) {
+                    window.location.reload(); // Recargar la página después de la actualización exitosa
+                }
+            });
+        }
+    });
+}
+
+function confirmRendicion(documentId) {
+    Swal.fire({
+        title: 'Confirmar Rendición',
+        text: '¿Estás seguro de que deseas rendir este documento?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, rendir',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Construir la URL con el documento_id
+            var url = "{% url 'rendir_documento' 0 %}".replace('0', documentId);
+
+            // Enviar la solicitud AJAX al backend
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'  // Asegurar que el token CSRF esté presente
+                },
+                success: function(response) {
+                    Swal.fire('¡Rendido!', 'El documento ha sido rendido correctamente.', 'success');
+                    window.location.reload(); // Recargar la página para reflejar el cambio
+                },
+                error: function() {
+                    Swal.fire('Error', 'Hubo un problema al intentar rendir el documento.', 'error');
+                }
+            });
+        }
+    });
+}
+
+</script>

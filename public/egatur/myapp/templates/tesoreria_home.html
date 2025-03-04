@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentos Aprobados - Tesorería</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #255A9E;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+        }
+        .container {
+            background-color: white;
+            color: #255A9E;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+        .btn-download {
+            color: #28a745;
+        }
+        .btn-download:hover {
+            color: #218838;
+        }
+        .btn-pay {
+            background-color: transparent; /* Fondo transparente */
+            border: none; /* Sin borde */
+            color: #ffc107; /* Color del texto */
+            font-size: 1.25rem; /* Tamaño del ícono */
+            cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+
+
+        }
+        .btn-pay:hover {
+            color: #e0a800; /* Color del texto en el hover */
+            text-decoration: none; /* Sin subrayado */
+        }
+
+        .badge-success, .badge-warning,.badge-egatur, .badge-focus {
+        font-size: 1rem !important; /* Aumenta el tamaño de la fuente */
+        padding: 0.5rem 1rem !important; /* Aumenta el padding para hacer más grande el fondo */
+        border-radius: 0.5rem !important; /* Mantiene el borde redondeado */
+        display: inline-block !important; /* Asegura que se respete el estilo de display */
+    }
+    .collapse-btn {
+            width: 100%; /* Ocupa el 100% del contenedor */
+            display: flex; /* Usa flexbox para alinear los elementos */
+            justify-content: space-between; /* Espacio entre texto e icono */
+            text-align: left; /* Alinea el texto a la izquierda */
+            padding: 10px; /* Espaciado interno */
+            border-radius: 4px; /* Bordes redondeados */
+        }
+    </style>
+    {% include 'header.html' %}
+</head>
+<body>
+    <div class="container mx-auto mt-5 p-5 bg-white rounded-lg shadow-lg">
+
+        <!-- Contenedor de Cards -->
+        <div class="flex justify-center mb-7">
+            <div class="bg-yellow-500 text-white p-4 rounded-lg shadow-md flex flex-col items-center w-52">
+                <i class="fas fa-money-bill text-4xl mb-2"></i>
+                <h5 class="text-xl font-semibold">Por Pagar</h5>
+                <p class="text-2xl">{{documentos_por_pagar}}</p> <!-- Reemplazar con el número real -->
+            </div>
+        </div>
+    
+        <div>
+            <button id="toggleButton" class="btn btn-primary mb-3 collapse-btn">
+                Documentos por Pagar <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="documentosSection" style="display: none;">
+                {% include 'documentos_tesoreria.html' %}
+            </div>
+            {% include 'mensajes.html' %}
+        </div>
+    </div>
+    
+    
+<script>
+    $(document).ready(function() {      
+        $("#toggleButton").click(function() {
+            $("#documentosSection").toggle(500); 
+        });
+        $("#toggleButtonRevisar").click(function() {
+            $("#documentosTable").toggle(500);
+        });
+    });
+</script>
+
+
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    
+    
+</body>
+</html>

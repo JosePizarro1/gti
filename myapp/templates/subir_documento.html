@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Documento</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    {% include 'header.html' %} <!-- Incluir el encabezado si es necesario -->
+
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Subir Documento</h2>
+        
+        <form id="uploadForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="tipo">Tipo de Documento</label>
+                <select class="form-control" id="tipo" name="tipo" required>
+                    {% for tipo, tipo_display in tipos_documento.items %}
+                        <option value="{{ tipo }}">{{ tipo_display }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="asunto">Asunto</label>
+                <input type="text" class="form-control" id="asunto" name="asunto" placeholder="Ingrese el asunto" value="">
+            </div>
+            <div class="form-group">
+                <label for="archivo">Archivo</label>
+                <input type="file" class="form-control" id="archivo" name="archivo" accept=".pdf" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Subir</button>
+            <a href="{% url 'usuario_home' %}" class="btn btn-secondary">Regresar a Inicio</a>
+        </form>
+        
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            // Función para actualizar el placeholder del campo "Asunto" dependiendo del tipo de documento seleccionado
+            function actualizarPlaceholder(tipoSeleccionado) {
+                // Cambiar el placeholder dependiendo del tipo seleccionado
+                if (tipoSeleccionado === 'FUT') {
+                    $('#asunto').attr('placeholder', 'Asunto');
+                } else if (tipoSeleccionado === 'REQ') {
+                    $('#asunto').attr('placeholder', 'Ingrese su número de req');
+                } else if (tipoSeleccionado === 'INF') {
+                    $('#asunto').attr('placeholder', 'Ingrese su número de informe');
+                }
+            }
+
+            // Cambiar el placeholder al cargar la página por el valor por defecto
+            var tipoSeleccionado = $('#tipo').val();
+            actualizarPlaceholder(tipoSeleccionado);
+
+            // Cambiar el placeholder cuando el tipo de documento se cambia
+            $('#tipo').on('change', function() {
+                tipoSeleccionado = $(this).val(); // Obtener el valor seleccionado
+                actualizarPlaceholder(tipoSeleccionado);
+            });
+
+            // Manejador del envío del formulario con SweetAlert
+            $('#uploadForm').on('submit', function(e) {
+                e.preventDefault(); // Prevenir el envío normal del formulario
+
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "¿Deseas subir este documento?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, subir',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Si se confirma, enviamos el formulario
+                        this.submit();
+                    }
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>

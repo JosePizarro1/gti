@@ -1,0 +1,291 @@
+       
+       <style>
+        .table-container {
+    overflow-x: auto; /* Permite el desplazamiento horizontal si es necesario */
+    width: 100%;
+}
+
+
+#aprobarModal {
+    display: none !important;
+}
+
+       </style>
+       <!-- Filtros -->
+       <div class="row mb-3">
+        <div class="col-md-6">
+            <h4>Filtrar por Tipo</h4>
+            <select id="tipoFiltro" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">Todos</option>
+                <option value="FUT">FUT</option>
+                <option value="REQ">Requerimientos</option>
+                <option value="INF">Informes</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <h4>Filtrar por Prioridad</h4>
+            <select id="filterPrioridad" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">Todas</option>
+                <option value="ALTA">Alta</option>
+                <option value="MEDIA">Media</option>
+                <option value="BAJA">Baja</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabla de Documentos -->
+<!-- Contenedor de la tabla -->
+<div class="overflow-x-auto mt-3">
+    <table class="min-w-full bg-white divide-y divide-gray-200 border border-gray-300 rounded-lg shadow-sm" id="documentosTable">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Área</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sede</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Emisión</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioridad</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for documento in documentos %}
+            <tr class="hover:bg-gray-0">
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.usuario.username }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.usuario.roles.area }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">
+                    {% if documento.usuario.roles.sede == 'EGATUR' %}
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">EGATUR</span>
+                    {% elif documento.usuario.roles.sede == 'FOCUS' %}
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-red-300 text-red-800 rounded-full">FOCUS</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.fecha_emision }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.get_tipo_display }}</td>
+                <td class="px-6 py-4 text-sm">
+                    {% if documento.usuario.roles.prioridad == 'ALTA' %}
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-red-300 text-yellow-800 rounded-full">ALTA</span>
+                    {% elif documento.usuario.roles.prioridad == 'MEDIA' %}
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-yellow-100 text-orange-800 rounded-full">MEDIA</span>
+                    {% else %}
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded-full">BAJA</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500 flex items-center space-x-2">
+                    <i class="fas fa-check text-green-600 hover:text-green-800 cursor-pointer action-approve" title="Aprobar" data-documento-id="{{ documento.id }}"></i>
+                    <i class="fas fa-times text-red-600 hover:text-red-800 cursor-pointer" title="Rechazar" data-toggle="modal" data-target="#rechazarModal" data-documento-id="{{ documento.id }}"></i>
+                    <a href="{{ documento.archivo.url }}" class="text-blue-600 hover:text-blue-800" title="Ver Archivo" target="_blank">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800" data-toggle="modal" data-target="#uploadSignatureModal">Subir Firma Digital</button>
+</div>
+<!-- Modal para Aprobar Documento -->
+<div class="modal fade" id="aprobarModal" tabindex="-1" aria-labelledby="aprobarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form method="post" id="aprobarForm" action="{% url 'aprobar_documento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="documento_id" name="documento_id" value="">
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para Rechazar Documento -->
+<!-- Modal para Rechazar Documento -->
+<div class="modal fade" id="rechazarModal" tabindex="-1" aria-labelledby="rechazarModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="rechazarModalLabel">Rechazar Documento</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form method="post" id="rechazarForm" action="{% url 'rechazar_documento' %}">
+                {% csrf_token %}
+                <input type="hidden" id="documento_id" name="documento_id" value="">
+                <div class="form-group">
+                    <label for="motivo_rechazo">Motivo de Rechazo</label>
+                    <textarea class="form-control" id="motivo_rechazo" name="motivo_rechazo" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger">Rechazar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<!-- Modal para Subir Firma Digital -->
+<div class="modal fade" id="uploadSignatureModal" tabindex="-1" aria-labelledby="uploadSignatureModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadSignatureModalLabel">Subir Firma Digital</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data" action="{% url 'upload_signature' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="firma">Seleccionar Firma</label>
+                        <input type="file" class="form-control-file" id="firma" name="firma" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Subir Firma</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+var table =             $('#documentosTable').DataTable({
+"language": {
+    "search": "Buscar:",
+    "paginate": {
+        "next": "Siguiente",
+        "previous": "Anterior"
+    },
+    "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+    "infoEmpty": "No hay entradas para mostrar",
+    "infoFiltered": "(filtrado de _MAX_ entradas en total)",
+    "lengthMenu": "Mostrar _MENU_ entradas",
+    "zeroRecords": "No se encontraron registros",
+    "emptyTable": "No hay datos disponibles en la tabla",
+    "loadingRecords": "Cargando...",
+    "processing": "Procesando...",
+    "searchPlaceholder": "Buscar..."
+},
+"order": [[1, "desc"]] // Ordena por la columna de fecha de emisión (columna 3) de manera descendente
+
+});
+
+// Filtro por Tipo
+$('#filterTipo').on('change', function() {
+    var tipo = $(this).val();
+    table.column(4).search(tipo).draw(); // Filtrar por la columna Tipo
+});
+
+// Filtro por Prioridad
+$('#filterPrioridad').on('change', function() {
+    var prioridad = $(this).val();
+    table.column(5).search(prioridad).draw(); // Filtrar por la columna Prioridad
+});
+});
+
+    $(document).ready(function() {
+        // Inicialización de DataTables
+
+            // Manejo del clic en el ícono de aprobar
+        $('.action-approve').on('click', function() {
+            var documentoId = $(this).data('documento-id');
+            
+            // Mostrar la alerta de confirmación de SweetAlert
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¿Estás seguro de que quieres aprobar este documento?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Sí, aprobar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, envía el formulario
+                    $('#aprobarForm #documento_id').val(documentoId); // Asigna el ID del documento al formulario
+                    $('#aprobarForm').submit(); // Enviar el formulario
+                }
+            });
+        });
+
+
+
+
+        // Configuración del modal para rechazar documentos
+        $('#rechazarModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var documentoId = button.data('documento-id');
+            var modal = $(this);
+            modal.find('#documento_id').val(documentoId);
+        });
+
+        // Manejo del formulario para aprobar documentos
+        $('#aprobarForm').on('submit', function(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Documento aprobado con éxito.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).off('submit').submit();
+                }
+            });
+        });
+
+        // Manejo del formulario para rechazar documentos
+        $('#rechazarForm').on('submit', function(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Documento rechazado con éxito.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).off('submit').submit();
+                }
+            });
+        });
+
+        // Configuración del modal para subir firma digital
+        $('#uploadSignatureModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            // Puedes manejar datos adicionales aquí si es necesario
+        });
+
+        // Manejo del formulario para subir firma digital
+        $('#uploadSignatureModal form').on('submit', function(event) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Firma digital subida con éxito.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).off('submit').submit();
+                }
+            });
+        });
+    });
+</script>

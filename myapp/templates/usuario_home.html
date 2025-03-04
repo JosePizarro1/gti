@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            background-color: #255A9E;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+        }
+        .container {
+            background-color: white;
+            color: #255A9E;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+        .nav-tabs .nav-link {
+            color: #255A9E;
+        }
+        .nav-tabs .nav-link.active {
+            color: white;
+            background-color: #255A9E;
+        }
+        .btn-primary {
+            background-color: #255A9E;
+            border-color: #255A9E;
+        }
+        .btn-primary:hover {
+            background-color: #19497c;
+            border-color: #19497c;
+        }
+        .btn-dark {
+            background-color: #1d1d1d;
+            color: white;
+        }
+        .btn-dark:hover {
+            background-color: #0a0a0a;
+            border-color: #0a0a0a;
+        }
+        .collapse-btn {
+            width: 100%; /* Ocupa el 100% del contenedor */
+            display: flex; /* Usa flexbox para alinear los elementos */
+            justify-content: space-between; /* Espacio entre texto e icono */
+            text-align: left; /* Alinea el texto a la izquierda */
+            padding: 10px; /* Espaciado interno */
+            border-radius: 4px; /* Bordes redondeados */
+        }
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.5em 1em;
+        border-radius: 0.3em;
+        border: 1px solid #ddd;
+        margin: 0 0.1em;
+    }
+    </style>
+    {% include 'header.html' %}
+</head>
+<body>
+
+
+    <div class="container mx-auto mt-5 p-5 bg-white rounded-lg shadow-lg">
+        
+        
+        {% if user.roles.es_jefe_area or user.roles.area == "ACADEMICA" %}
+        <div class="absolute top-25 right-5">
+            {% if ultimo_formato %}
+                <a href="{{ ultimo_formato.archivo.url }}" class="flex flex-col items-center bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg shadow-lg transition duration-300">
+                    <i class="fas fa-file-word text-5xl"></i>
+                    <span class="text-sm mt-1">Descargar formato Word</span>
+                </a>
+            {% else %}
+                <button class="flex flex-col items-center bg-gray-400 text-white py-3 px-4 rounded-lg shadow-lg" disabled>
+                    <i class="fas fa-file-word text-5xl"></i>
+                    <span class="text-sm mt-1">No hay formatos disponibles</span>
+                </button>
+            {% endif %}
+        </div>
+    {% endif %}
+
+
+        <!-- Contenedor de Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-center mb-8">
+            <div class="bg-blue-500 text-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                <i class="fas fa-clock text-4xl mb-2"></i>
+                <h5 class="text-xl font-semibold">En Proceso</h5>
+                <p class="text-2xl">{{pendientes_count}}</p> <!-- Reemplazar con el número real -->
+            </div>
+            <div class="bg-green-500 text-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                <i class="fas fa-check-circle text-4xl mb-2"></i>
+                <h5 class="text-xl font-semibold">Aprobados</h5>
+                <p class="text-2xl">{{aprobados_count}}</p> <!-- Reemplazar con el número real -->
+            </div>
+            <div class="bg-red-500 text-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                <i class="fas fa-times-circle text-4xl mb-2"></i>
+                <h5 class="text-xl font-semibold">Denegados</h5>
+                <p class="text-2xl">{{denegados_count}}</p> <!-- Reemplazar con el número real -->
+            </div>
+            <div class="bg-yellow-500 text-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                <i class="fas fa-money-bill text-4xl mb-2"></i>
+                <h5 class="text-xl font-semibold">Por Pagar</h5>
+                <p class="text-2xl">{{pagados_count}}</p> <!-- Reemplazar con el número real -->
+            </div>
+        </div>
+        <div>
+            <button id="toggleButton" class="btn btn-primary mb-3 collapse-btn">
+                Documentos <i class="fas fa-chevron-down"></i>
+            </button>
+            <div id="documentosSection" style="display: none;">
+                {% include 'documentos.html' %}
+            </div>
+    {% if es_jefe_area %}
+        <!-- Botón para mostrar/ocultar documentos por revisar -->
+        <button id="toggleButtonRevisar" class="btn btn-dark mb-3 collapse-btn">
+            Documentos por revisar <i class="fas fa-chevron-down"></i>
+        </button>
+        <!-- Sección colapsable de Documentos por Revisar -->
+        <div id="documentosPorRevisarSection" style="display: none;">
+            {% include 'documentos_por_revisar.html' %}
+        </div>
+    
+        <!-- Botón para mostrar/ocultar historial de archivos -->
+        <button id="toggleButtonHistorial" class="btn btn-success mb-3 collapse-btn">
+            Historial de Archivos <i class="fas fa-chevron-down"></i>
+        </button>
+        <!-- Sección colapsable de Historial de Archivos -->
+        <div id="documentosHistorialSection" style="display: none;">
+            {% include 'documentos_historial.html' %}
+        </div>
+    {% endif %}
+    <!-- Documentos por Rendir -->
+    <div id="avisosDocumentosPorRendir">
+        {% if documentos_por_rendir_info == "Sin documentos por rendir" %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <strong>Información:</strong> {{ documentos_por_rendir_info }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% else %}
+            {% for documento in documentos_por_rendir_info %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Documento por Rendir:</strong> {{ documento }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+       <!--     {% include 'mensajes.html' %}-->
+        </div>
+    </div>
+    
+    
+<!-- Modal -->
+<div class="modal fade" id="memosModal" tabindex="-1" aria-labelledby="memosModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-warning">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="memosModalLabel">🔔 Nuevo Memo Dirigido a Tu Área</h5>
+            </div>
+            <div class="modal-body">
+                {% if memos_para_el_jefe %}
+                    <ul class="list-group">
+                        {% for memo in memos_para_el_jefe %}
+                            <li class="list-group-item mb-3 shadow-sm border">
+                                <div class="alert alert-warning" role="alert">
+                                    <h6 class="alert-heading">Asunto: {{ memo.asunto }}</h6>
+                                    <p>{{ memo.contenido }}</p>
+                                    <hr>
+                                    <p class="mb-0"><strong>Fecha de envío:</strong> {{ memo.fecha_envio|date:"d/m/Y" }}</p>
+                                    <div class="mt-1 text-end">
+                                        <!-- Botón para descargar -->
+                                        <a href="{{ memo.archivo_pdf.url }}" 
+                                           class="btn btn-sm btn-success me-2 marcar-leido" 
+                                           data-id="{{ memo.id }}" 
+                                           target="_blank">
+                                            <i class="bi bi-eye"></i> Ver Memo
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="alert alert-info" role="alert">
+                        No tienes nuevos memos dirigidos a tu área.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+                {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    title: '{{ message.tags|title }}',
+                    text: '{{ message }}',
+                    icon: '{{ message.tags }}',  // success, info, warning, error
+                    timer: 10000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+            {% endfor %}
+        {% endif %}
+        const modal = new bootstrap.Modal(document.getElementById('memosModal'));
+        modal.show();
+
+        // Seleccionar botones para marcar como leído
+        const buttons = document.querySelectorAll('.marcar-leido');
+        buttons.forEach(button => {
+            button.addEventListener('click', function () {
+                const memoId = this.getAttribute('data-id');
+
+                // Enviar solicitud al backend para marcar como leído
+                fetch(`/marcar-leido/${memoId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        // Cerrar el modal una vez leído
+                        modal.hide();
+                    } else {
+                        console.error('Error al marcar como leído');
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {      
+        $("#toggleButton").click(function() {
+            $("#documentosSection").toggle(500); 
+        });
+        $("#toggleButtonRevisar").click(function() {
+            $("#documentosPorRevisarSection").toggle(500);
+        });
+        $("#toggleButtonHistorial").click(function() {
+            $("#documentosHistorialSection").toggle(500);
+        });
+    });
+</script>
+
+
+
+</body>
+
+
+</html>

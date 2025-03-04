@@ -1,0 +1,192 @@
+<!-- documentos.html -->
+
+<div class="mb-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+            <label for="tipoFiltro" class="block text-gray-700 font-semibold">Filtrar por Tipo</label>
+            <select id="tipoFiltro" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">Todos</option>
+                <option value="FUT">FUT</option>
+                <option value="REQ">Requerimientos</option>
+                <option value="INF">Informes</option>
+            </select>
+        </div>
+        <div>
+            <label for="estadoFiltro" class="block text-gray-700 font-semibold">Filtrar por Estado</label>
+            <select id="estadoFiltro" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">Todos</option>
+                <option value="PENDIENTE">Pendientes</option>
+                <option value="APROBADO">Aprobados</option>
+                <option value="DENEGADO">Denegados</option>
+            </select>
+        </div>
+        <div>
+            <label for="pagadoFiltro" class="block text-gray-700 font-semibold">Filtrar por Pagado</label>
+            <select id="pagadoFiltro" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">Todos</option>
+                <option value="True">Pagado</option>
+                <option value="False">No Pagado</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="overflow-x-auto">
+    <table id="documentosTable" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Tipo</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Fecha de Emisión</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Estado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Pagado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Visado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for documento in documentos %}
+                <tr class="hover:bg-gray-50" data-tipo="{{ documento.tipo }}" data-estado="{{ documento.estado }}" data-pagado="{{ documento.pagado }}">
+                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.usuario.username }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.tipo }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.fecha_emision }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">
+                        {% if documento.estado == 'DENEGADO' %}
+                            <span class="inline-block text-white bg-red-600 px-2 py-1 rounded font-semibold text-sm">{{ documento.estado }}</span>
+                        {% elif documento.estado == 'APROBADO' %}
+                            <span class="inline-block text-white bg-green-600 px-2 py-1 rounded font-semibold text-sm">{{ documento.estado }}</span>
+                        {% else %}
+                            <span class="inline-block text-white bg-yellow-500 px-2 py-1 rounded font-semibold text-sm">{{ documento.estado }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                        {% if documento.pagado %}
+                        <i class="fas fa-check text-green-600"></i>  <!-- Icono de check si está visado -->
+                        {% else %}
+                        <i class="fas fa-times text-red-600"></i>  <!-- Icono de X si no está visado -->
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                        {% if documento.visado %}
+                            <i class="fas fa-check text-green-600"></i>  <!-- Icono de check si está visado -->
+                        {% else %}
+                            <i class="fas fa-times text-red-600"></i>  <!-- Icono de X si no está visado -->
+                        {% endif %}
+                    </td>
+                    <td class="action-icons text-center align-middle">
+                        {% if documento.estado == 'DENEGADO' %}
+                            <a href="{{ documento.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800" title="Ver Archivo">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <i class="fas fa-check text-green-600 cursor-pointer" title="Subsanar" data-id="{{ documento.id }}" data-toggle="modal" data-target="#subsanarModal"></i>
+                            <i class="fas fa-exclamation-circle text-red-600 cursor-pointer" title="Ver Observación" data-id="{{ documento.id }}" data-observacion="{{ documento.observacion }}" data-toggle="modal" data-target="#observacionModal"></i>
+                        {% elif documento.estado == 'PENDIENTE' %}
+                            <a href="{{ documento.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800" title="Ver Archivo">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        {% elif documento.estado == 'APROBADO' and documento.archivo_firmado %}
+                            <a href="{{ documento.archivo_firmado.url }}" class="text-green-600 hover:text-green-800" title="Descargar Archivo" download>
+                                <i class="fas fa-download"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="px-4 py-2 text-center text-gray-500">No se encontraron documentos</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800" onclick="window.location.href='{% url 'subir_documento' %}'">Subir Documento</button>
+</div>
+
+<!-- Modales (Subsanar y Observación) -->
+<div class="modal fade" id="subsanarModal" tabindex="-1" aria-labelledby="subsanarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white shadow rounded-lg">
+            <div class="modal-header border-b">
+                <h5 class="modal-title text-gray-800 font-semibold" id="subsanarModalLabel">Subsanar Documento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data" action="{% url 'subsanar_documento' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="documento_id" id="subsanarDocumentoId">
+                    <div class="form-group">
+                        <label for="archivo_nuevo" class="text-gray-700">Nuevo Archivo</label>
+                        <input type="file" class="form-input mt-1 block w-full" id="archivo_nuevo" name="archivo_nuevo" required>
+                    </div>
+                    <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">Subsanar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="observacionModal" tabindex="-1" aria-labelledby="observacionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white shadow rounded-lg">
+            <div class="modal-header border-b">
+                <h5 class="modal-title text-gray-800 font-semibold" id="observacionModalLabel">Observación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="observacionText" class="text-gray-600"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var table = $('#documentosTable').DataTable({
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+            },
+            "dom": '<"flex justify-between items-center mb-2"<"block sm:inline"l><"block sm:inline"f>>rt<"flex justify-between items-center mt-2"<"block sm:inline"i><"block sm:inline"p>>',
+            "pagingType": "simple_numbers",
+            "pageLength": 5,
+        });
+
+        $('#tipoFiltro, #estadoFiltro, #pagadoFiltro').on('change', function() {
+            var tipoFiltro = $('#tipoFiltro').val();
+            var estadoFiltro = $('#estadoFiltro').val();
+            var pagadoFiltro = $('#pagadoFiltro').val();
+
+            table.rows().every(function() {
+                var rowTipo = $(this.node()).data('tipo');
+                var rowEstado = $(this.node()).data('estado');
+                var rowPagado = $(this.node()).data('pagado').toString();
+
+                var showRow = (tipoFiltro === '' || rowTipo === tipoFiltro) &&
+                              (estadoFiltro === '' || rowEstado === estadoFiltro) &&
+                              (pagadoFiltro === '' || rowPagado === pagadoFiltro);
+
+                if (showRow) {
+                    $(this.node()).show();
+                } else {
+                    $(this.node()).hide();
+                }
+            });
+
+            table.draw(false);
+        });
+    });
+
+    $('#subsanarModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var documentoId = button.data('id');
+        $('#subsanarDocumentoId').val(documentoId);
+    });
+
+    $('#observacionModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var observacion = button.data('observacion');
+        $('#observacionText').text(observacion);
+    });
+</script>

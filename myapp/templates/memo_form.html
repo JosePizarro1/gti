@@ -1,0 +1,133 @@
+{% include 'header.html' %}
+
+<div class="container mt-5">
+    <!-- Sección de Subir Memo -->
+    <div class="mb-4">
+        <button id="toggleButtonSubir" class="btn btn-primary w-100 mb-3">
+            <i class="fas fa-plus-circle"></i> Subir Memo <i class="fas fa-chevron-down"></i>
+        </button>
+        <div id="subirMemoSection" class="p-4 border rounded shadow bg-white" style="display: none;">
+            <h2 class="text-center text-primary mb-4">Subir Memo</h2>
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div 
+                            class="alert {{ message.tags }} alert-dismissible fade show" 
+                            role="alert"
+                        >
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form id="memoForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="asunto">Asunto</label>
+                    <input type="text" id="asunto" name="asunto" class="form-control" placeholder="Asunto" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contenido">Contenido</label>
+                    <textarea id="contenido" name="contenido" class="form-control" placeholder="Contenido" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="archivo_pdf">Archivo PDF</label>
+                    <input type="file" id="archivo_pdf" name="archivo_pdf" class="form-control" accept=".pdf" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="destinatario_tipo">Tipo de Destinatario</label>
+                    <select id="destinatario_tipo" name="destinatario_tipo" class="form-control" required>
+                        <option value="todos">Todos los jefes de área</option>
+                        <option value="jefe_especifico">Jefe específico</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="areaDestinoGroup" style="display: none;">
+                    <label for="area_destino">Área de Destino</label>
+                    <select id="area_destino" name="area_destino" class="form-control">
+                        <option value="">Selecciona un área</option>
+                        <option value="SISTEMAS">Sistemas</option>
+                        <option value="MARKETING">Marketing</option>
+                        <option value="VENTAS">Ventas</option>
+                        <option value="IMAGEN_INSTITUCIONAL">Imagen Institucional</option>
+                        <option value="ACADEMICA">Académica</option>
+                        <option value="TESORERIA">Tesorería</option>
+                        <option value="ALMACEN">Almacén</option>
+                        <option value="COORDINACION_GENERAL_FOCUS">Coordinación General Focus</option>
+                        <option value="MARKETING_FOCUS">Área Marketing Focus</option>
+                        <option value="GERENCIA">Gerencia</option>
+                    </select>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success">Enviar Memo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sección de Memos Enviados -->
+    <div>
+        <button id="toggleButtonRevisar" class="btn btn-dark w-100 mb-3">
+            <i class="fas fa-folder-open"></i> Memos Enviados <i class="fas fa-chevron-down"></i>
+        </button>
+        <div id="documentosmemos" class="p-4 border rounded shadow bg-light" style="display: none;">
+            <h2 class="text-center text-secondary mb-3">Lista de Memos</h2>
+            {% include 'memos_tabla.html' %}
+        </div>
+    </div>
+    
+    
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        // Toggle para mostrar/ocultar la sección "Subir Memo"
+        $("#toggleButtonSubir").on('click', function() {
+            $("#subirMemoSection").slideToggle(500);
+            $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+        });
+
+        // Toggle para mostrar/ocultar la sección "Memos Enviados"
+        $("#toggleButtonRevisar").on('click', function() {
+            $("#documentosmemos").slideToggle(500);
+            $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+        });
+
+        // Mostrar/ocultar área destino según el tipo de destinatario
+        $("#destinatario_tipo").on('change', function () {
+            if ($(this).val() === 'jefe_especifico') {
+                $("#areaDestinoGroup").fadeIn(300);
+            } else {
+                $("#areaDestinoGroup").fadeOut(300);
+            }
+        });
+
+        // Interceptar el envío del formulario con SweetAlert
+        $("#memoForm").on('submit', function(event) {
+            event.preventDefault(); // Detener el envío automático del formulario
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¿Deseas enviar este memo?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, enviar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit(); // Enviar el formulario si se confirma
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,126 @@
+<style>
+    .table-container {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    table {
+        border-radius: 8px;
+        border-collapse: collapse;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.4rem 0.8rem;
+        margin: 0 2px;
+        border-radius: 4px;
+        background-color: #007BFF;
+        color: #fff !important;
+        text-decoration: none;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: #0056b3;
+        color: #fff;
+    }
+</style>
+
+<div class="table-container mt-4">
+<table id="documentosTable" class="table table-striped table-bordered shadow-lg rounded-lg w-full">
+    <thead class="bg-gray-100">
+        <tr>
+            <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">ID</th>
+            <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">Asunto</th>
+            <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">Fecha</th>
+            <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">Acciones</th>
+        </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+        {% for memo in memos %}
+            <tr>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ memo.id }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ memo.asunto }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ memo.fecha_envio|date:"d/m/Y" }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500 flex items-center space-x-3">
+                    <!-- Botón para ver el memo -->
+                    <a href="{{ memo.archivo_pdf.url }}" target="_blank" class="btn btn-info text-white px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-700 transition duration-300 ease-in-out">Ver</a>
+                    
+                    <!-- Botón para eliminar el memo -->
+                    <form action="{% url 'eliminar_memo' %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="memo_id" value="{{ memo.id }}">
+                        <button type="submit" class="btn btn-danger text-white px-3 py-1 rounded-lg bg-red-500 hover:bg-red-700 transition duration-300 ease-in-out">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<!-- SweetAlert y DataTables -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#memosTable').DataTable({
+            language: {
+                search: "Buscar:",
+                paginate: {
+                    next: "Siguiente",
+                    previous: "Anterior"
+                },
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "No hay registros disponibles",
+                lengthMenu: "Mostrar _MENU_ registros",
+                zeroRecords: "No se encontraron registros",
+                emptyTable: "No hay datos para mostrar",
+                loadingRecords: "Cargando...",
+                processing: "Procesando...",
+                searchPlaceholder: "Buscar memos..."
+            },
+            order: [[2, 'desc']] // Ordenar por fecha de envío de manera descendente
+        });
+    });
+
+    function confirmarEliminar(memoId) {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esto eliminará el memo de manera permanente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Eliminar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Enviar solicitud al backend para eliminar el memo
+                $.ajax({
+                    url: "{% url 'eliminar_memo' %}",
+                    method: "POST",
+                    data: {
+                        memo_id: memoId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            Swal.fire("Eliminado", "El memo ha sido eliminado.", "success").then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire("Error", "No se pudo eliminar el memo.", "error");
+                        }
+                    },
+                    error: function() {
+                        Swal.fire("Error", "Ocurrió un problema al eliminar el memo.", "error");
+                    }
+                });
+            }
+        });
+    }
+</script>

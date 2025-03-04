@@ -1,0 +1,111 @@
+       
+       <style>
+        .table-container {
+    overflow-x: auto; /* Permite el desplazamiento horizontal si es necesario */
+    width: 100%;
+}
+
+
+#aprobarModal {
+    display: none !important;
+}
+
+       </style>
+    <!-- Tabla de Documentos -->
+<!-- Contenedor de la tabla -->
+<div class="overflow-x-auto mt-3">
+    <table class="min-w-full bg-white divide-y divide-gray-200 border border-gray-300 rounded-lg shadow-sm" id="documentosTable1">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Area</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sede</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asunto</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for documento in documentos_aprobados %}
+            <tr class="hover:bg-gray-0">
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.id }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.usuario.first_name }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.usuario.roles.area }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">
+                    {% if documento.usuario.roles.sede == 'EGATUR' %}
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">EGATUR</span>
+                    {% elif documento.usuario.roles.sede == 'FOCUS' %}
+                        <span class="inline-block px-3 py-1 text-sm font-medium bg-red-300 text-red-800 rounded-full">FOCUS</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.asunto }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ documento.get_tipo_display }}</td>
+
+                <td class="px-6 py-4 text-sm text-gray-500 flex items-center space-x-2">
+
+                    <a href="{{ documento.archivo.url }}" class="text-blue-600 hover:text-blue-800" title="Ver Archivo" target="_blank">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                        <!-- Mostrar Fechas -->
+                    <button class="text-green-600 hover:text-green-800" title="Ver Fechas"
+                            onclick="mostrarFechas('{{ documento.fecha_recepcion }}', '{{ documento.fecha_emision }}')">
+                        <i class="fas fa-calendar-alt"></i>
+                    </button>
+                </td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+var table =             $('#documentosTable1').DataTable({
+"language": {
+    "search": "Buscar:",
+    "paginate": {
+        "next": "Siguiente",
+        "previous": "Anterior"
+    },
+    "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+    "infoEmpty": "No hay entradas para mostrar",
+    "infoFiltered": "(filtrado de _MAX_ entradas en total)",
+    "lengthMenu": "Mostrar _MENU_ entradas",
+    "zeroRecords": "No se encontraron registros",
+    "emptyTable": "No hay datos disponibles en la tabla",
+    "loadingRecords": "Cargando...",
+    "processing": "Procesando...",
+    "searchPlaceholder": "Buscar..."
+},
+"order": [[1, "desc"]] // Ordena por la columna de fecha de emisión (columna 3) de manera descendente
+
+});
+
+</script>
+<script>
+function mostrarFechas(fechaRecepcion, fechaEmision) {
+    Swal.fire({
+        title: 'Detalles de Fechas',
+        html: `
+            <div style="text-align: center; font-size: 18px; line-height: 1.6;">
+                <p><strong>📅 Fecha de Recepcion:</strong><br> ${fechaRecepcion ? fechaRecepcion : 'No disponible'}</p>
+                <p><strong>📄 Fecha de Emision:</strong><br> ${fechaEmision ? fechaEmision : 'No disponible'}</p>
+            </div>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Cerrar'
+    });
+}
+
+</script>

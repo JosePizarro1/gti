@@ -1,0 +1,94 @@
+<style>
+    .estado-pendiente {
+        color: white;
+        background-color: #ffc107;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .estado-aprobado {
+        color: white;
+        background-color: #28a745;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .action-icons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .action-icons i {
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    .action-icons a {
+        text-decoration: none;
+        color: #007bff;
+    }
+    .action-icons a:hover {
+        color: #0056b3;
+    }
+</style>
+
+<div class="overflow-x-auto">
+    <table id="documentosHistorialTable" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Id</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Tipo</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Fecha de Emisión</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Estado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Acciones</th>
+            </tr>
+        </thead>
+<tbody class="bg-white divide-y divide-gray-200">
+    {% if documentos_historial %}
+        {% for documento in documentos_historial %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 whitespace-nowrap">{{ documento.id }}</td>
+                <td class="px-4 py-2 whitespace-nowrap">{{ documento.usuario.get_full_name }}</td>
+                <td class="px-4 py-2 whitespace-nowrap">{{ documento.tipo }}</td>
+                <td class="px-4 py-2 whitespace-nowrap">{{ documento.fecha_emision|date:"d/m/Y" }}</td>
+                <td class="px-4 py-2 whitespace-nowrap">
+                    {% if documento.estado == 'PENDIENTE' %}
+                        <span class="estado-pendiente">Pendiente</span>
+                    {% elif documento.estado == 'APROBADO' %}
+                        <span class="estado-aprobado">Aprobado</span>
+                    {% endif %}
+                </td>
+                <td class="action-icons">
+                    <a href="{{ documento.archivo.url }}" target="_blank" title="Ver Archivo">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{{ documento.archivo.url }}" download title="Descargar Archivo">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="6" class="px-4 py-2 text-center text-gray-500">No se encontraron documentos</td>
+        </tr>
+    {% endif %}
+</tbody>
+
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#documentosHistorialTable').DataTable({
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+            },
+            "dom": '<"flex justify-between items-center mb-2"<"block sm:inline"l><"block sm:inline"f>>rt<"flex justify-between items-center mt-2"<"block sm:inline"i><"block sm:inline"p>>',
+            "pagingType": "simple_numbers",
+            "pageLength": 5,
+                        "order": [[0, "desc"]], // Ordenar por la primera columna (columna 0) en descendente
+
+        });
+    });
+</script>
