@@ -110,7 +110,7 @@ class Documento(models.Model):
         ('DENEGADO', 'Denegado')
     ]
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documentos')
-    tipo = models.CharField(max_length=3, choices=TIPOS_DOCUMENTO)
+    tipo = models.CharField(max_length=10, choices=TIPOS_DOCUMENTO)
     archivo = models.FileField(upload_to='documentos/')
     archivo_firmado = models.FileField(upload_to='documentos_firmados/', null=True, blank=True)
     archivo_rendicion = models.FileField(upload_to='documentos_rendicion/', null=True, blank=True)  # Nuevo campo

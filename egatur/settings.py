@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-3@u7igyk)u9(&fidfrp5025m&trxc3o3@wx_88cz@$sw_4ty#v
 DEBUG = True
 DEFAULT_CHARSET = 'utf-8'
 
-ALLOWED_HOSTS = ['gti.egatur.edu.pe','www.gti.egatur.edu.pe']
+#ALLOWED_HOSTS = ['gti.egatur.edu.pe','www.gti.egatur.edu.pe']
 
 LOGOUT_REDIRECT_URL = '/login/'
 import os 
