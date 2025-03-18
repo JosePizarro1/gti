@@ -9,6 +9,27 @@
 #aprobarModal {
     display: none !important;
 }
+.btn-custom {
+    background-color: #6f42c1; /* Color morado Bootstrap */
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-custom:hover {
+    background-color: #5936a6;
+    color: white;
+}
+table.dataTable {
+    width: 100%;
+    margin: 0 auto;
+    clear: both;
+    border-collapse: collapse; /* Cambiado de separate a collapse */
+    border-spacing: 0;
+}
 
        </style>
        <!-- Filtros -->
@@ -73,25 +94,34 @@
                         <span class="inline-block px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded-full">BAJA</span>
                     {% endif %}
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-500 flex items-center space-x-2">
-                    <i class="fas fa-check text-green-600 hover:text-green-800 cursor-pointer action-approve" title="Aprobar" data-documento-id="{{ documento.id }}"></i>
-                    
-                    <!-- Aquí se coloca el botón para abrir el modal de rechazo, con el ID único -->
-                    <i class="fas fa-times text-red-600 hover:text-red-800 cursor-pointer action-reject" 
-                       title="Rechazar" 
-                       data-toggle="modal" 
-                       data-target="#rechazarModal{{ documento.id }}" 
-                       data-documento-id="{{ documento.id }}">
-                    </i>
+<td class="px-6 py-4 text-sm text-gray-500 flex items-center space-x-2">
+    <i class="fas fa-check text-green-600 hover:text-green-800 cursor-pointer action-approve 
+              bg-green-100 p-1.5 rounded-md text-base" 
+       title="Aprobar" 
+       data-documento-id="{{ documento.id }}"
+       data-tipo="{{ documento.get_tipo_display }}">
+    </i>
 
-                    <a href="{{ documento.archivo.url }}" class="text-blue-600 hover:text-blue-800" title="Ver Archivo" target="_blank">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <button class="btn btn-info btn-sm text-white shadow-none border-0" title="Ver Fechas"
-                                    onclick="mostrarFechas('{{ documento.fecha_recepcion }}', '{{ documento.fecha_emision }}')">
-                                <i class="fas fa-calendar-alt"></i>
-                    </button>
-                </td>
+    <i class="fas fa-times text-red-600 hover:text-red-800 cursor-pointer action-reject 
+              bg-red-100 p-1.5 rounded-md text-base" 
+       title="Rechazar" 
+       data-toggle="modal" 
+       data-target="#rechazarModal{{ documento.id }}" 
+       data-documento-id="{{ documento.id }}">
+    </i>
+
+    <a href="{{ documento.archivo.url }}" class="text-blue-600 hover:text-blue-800" title="Ver Archivo" target="_blank">
+        <i class="fas fa-eye bg-blue-100 p-1.5 rounded-md text-base"></i>
+    </a>
+
+    <button class="cursor-pointer bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-gray-200 p-1.5 rounded-md"
+            title="Ver Fechas"
+            onclick="mostrarFechas('{{ documento.fecha_recepcion }}', '{{ documento.fecha_emision }}')">
+        <i class="fas fa-calendar-alt text-base"></i>
+    </button>
+</td>
+
+
                 
             </tr>
 
@@ -199,15 +229,30 @@
         </div>
     </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% if messages %}
+<script>
+$(document).ready(function(){
+    {% for message in messages %}
+    Swal.fire({
+        title: "{{ message.tags|title }}",
+        text: "{{ message|escapejs }}",
+        icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'info' %}info{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+        confirmButtonText: "OK"
+    });
+    {% endfor %}
+});
+</script>
+{% endif %}
 
 <script>
     $(document).ready(function() {
-var table =             $('#documentosTable').DataTable({
+var table =$('#documentosTable').DataTable({
 "language": {
     "search": "Buscar:",
     "paginate": {
@@ -227,6 +272,7 @@ var table =             $('#documentosTable').DataTable({
 "order": [[1, "desc"]] // Ordena por la columna de fecha de emisión (columna 3) de manera descendente
 
 });
+
 
 // Filtro por Tipo
 $('#filterTipo').on('change', function() {
@@ -252,52 +298,6 @@ $(document).on('click', '.action-reject', function() {
     modal.find('#documento_id').val(documentoId);
 });
 
-$(document).on('click', '.action-approve', function() {
-    var documentoId = $(this).data('documento-id');
-
-    // Mostrar la alerta de confirmación de SweetAlert
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: '¿Estás seguro de que quieres aprobar este documento?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#28a745',
-        cancelButtonColor: '#dc3545',
-        confirmButtonText: 'Sí, aprobar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Si el usuario confirma, envía el formulario
-            $('#aprobarForm #documento_id').val(documentoId); // Asigna el ID del documento al formulario
-            $('#aprobarForm').submit(); // Enviar el formulario
-        }
-    });
-
-
-
-
-
-
-
-
-
-        // Manejo del formulario para aprobar documentos
-        $('#aprobarForm').on('submit', function(event) {
-            event.preventDefault();
-            Swal.fire({
-                title: 'Éxito',
-                text: 'Documento aprobado con éxito.',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $(this).off('submit').submit();
-                }
-            });
-        });
-
-
-
         // Configuración del modal para subir firma digital
         $('#uploadSignatureModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
@@ -318,5 +318,76 @@ $(document).on('click', '.action-approve', function() {
                 }
             });
         });
+$(document).on('click', '.action-approve', function() {
+    var documentoId = $(this).data('documento-id');
+    var docType = $(this).data('tipo'); // Obtenemos el tipo del documento
+
+    // Configurar opciones básicas para SweetAlert
+    var swalOptions = {
+        title: '¿Estás seguro?',
+        text: '¿Estás seguro de que quieres aprobar este documento?',
+        icon: 'warning',
+        allowOutsideClick: false, // Forzamos a seleccionar una opción
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar', // Botón de cancelación estándar
+        didOpen: () => {
+            // Deshabilitar el botón "Enviar a Gerencia" por 1 segundo para evitar clics accidentales
+            const confirmBtn = Swal.getConfirmButton();
+            confirmBtn.disabled = true;
+            setTimeout(() => { confirmBtn.disabled = false; }, 1000);
+        }
+    };
+
+    // Configurar según el tipo de documento
+    if (docType === 'Requerimientos' || docType === 'Requerimiento-Pasaje') {
+        // Solo mostrar la opción de "Enviar a Gerencia"
+        swalOptions.showDenyButton = false;
+        swalOptions.confirmButtonText = 'Enviar a Gerencia';
+    } else if (docType === 'Informes') {
+        // Mostrar tres opciones: Enviar a Gerencia, Enviar a Tesoreria y Aprobación Interna
+        swalOptions.showDenyButton = true;
+        swalOptions.confirmButtonText = 'Enviar a Gerencia';
+        swalOptions.denyButtonText = 'Enviar a Tesoreria';
+        swalOptions.footer = '<button id="btnAprobacionInterna" class="btn btn-sm btn-custom mt-2">Aprobación Interna</button>';
+    } else {
+        // Para otros tipos, mostrar dos opciones: Enviar a Gerencia y Enviar a Tesoreria
+        swalOptions.showDenyButton = true;
+        swalOptions.confirmButtonText = 'Enviar a Gerencia';
+        swalOptions.denyButtonText = 'Enviar a Tesoreria';
+    }
+
+    Swal.fire(swalOptions).then((result) => {
+        if (result.isConfirmed) {
+            // Acción: Enviar a Gerencia
+            $('#aprobarForm #documento_id').val(documentoId);
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'enviarOpcion',
+                value: 'gerencia'
+            }).appendTo('#aprobarForm');
+            $('#aprobarForm').submit();
+        } else if (result.isDenied) {
+            // Acción: Enviar a Tesoreria
+            $('#aprobarForm #documento_id').val(documentoId);
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'enviarOpcion',
+                value: 'tesoreria'
+            }).appendTo('#aprobarForm');
+            $('#aprobarForm').submit();
+        } 
     });
+
+    // Manejar el clic en "Aprobación Interna"
+    $(document).on('click', '#btnAprobacionInterna', function() {
+        $('#aprobarForm #documento_id').val(documentoId);
+        $('<input>').attr({
+            type: 'hidden',
+            name: 'enviarOpcion',
+            value: 'interna'
+        }).appendTo('#aprobarForm');
+        $('#aprobarForm').submit();
+    });
+});
+
 </script>

@@ -27,7 +27,25 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .models import Memo,Formato
 import json
+import random
+import string
+def cambiar_contrasena(request):
+    if request.method == "POST":
+        user_id = request.POST.get("usuario")
+        nueva_contrasena = request.POST.get("nueva_contrasena")
 
+        if not user_id or not nueva_contrasena:
+            return JsonResponse({"success": False, "message": "Todos los campos son obligatorios."})
+
+        usuario = get_object_or_404(User, id=user_id)
+        usuario.set_password(nueva_contrasena)
+        usuario.save()
+
+        return JsonResponse({"success": True, "message": f"Contraseña actualizada: {nueva_contrasena}"})
+
+    usuarios = User.objects.all()
+    return render(request, "cambiar_contrasena.html", {"usuarios": usuarios})
+    
 def descargar_formatos(request):
     formatos = get_list_or_404(Formato)
 
@@ -159,6 +177,8 @@ def login_view(request):
                     return redirect('admin_home')
                 elif user_rol.rol == 'SECRETARIA':
                     return redirect('secretaria_home')
+                elif user_rol.rol == 'GERENTE':
+                    return redirect('gerente_home')                    
                 elif user_rol.rol == 'USUARIO':
                     return redirect('usuario_home')
                 elif user_rol.rol == 'TESORERIA':  # Nueva condición para Tesorería
@@ -170,6 +190,78 @@ def login_view(request):
     return render(request, 'login.html')
 
 from reportlab.lib.colors import blue  # Importa el color azul
+def gerente_home(request):
+    rol_usuario = request.user.roles.rol  # Acceso directo al rol del usuario
+    # Mapa para las prioridades (ALTA, MEDIA, BAJA)
+    prioridad_map = {
+        'ALTA': 3,
+        'MEDIA': 2,
+        'BAJA': 1
+    }
+
+    # Obtener documentos por prioridad y estado 'PENDIENTE', visados
+    documentos_alta = Documento.objects.filter(
+        estado='PENDIENTE',
+        visado=True,
+        visado_admin=True,
+        prioridad='ALTA',
+        interno=False,
+    ).order_by('fecha_emision')  # Ordenar por fecha de emisión (del más antiguo al más reciente)
+
+    documentos_media = Documento.objects.filter(
+        estado='PENDIENTE',
+        visado=True,
+        visado_admin=True,
+        prioridad='MEDIA',
+        interno=False,
+    ).order_by('fecha_emision')
+
+    documentos_baja = Documento.objects.filter(
+        estado='PENDIENTE',
+        visado=True,
+        visado_admin=True,
+        prioridad='BAJA',
+        interno=False,
+    ).order_by('fecha_emision')
+
+    # Unir todas las listas de documentos en el orden de prioridad
+    documentos = list(documentos_alta) + list(documentos_media) + list(documentos_baja)
+
+    # Filtrar por tipo de documento si se proporciona
+    tipo_filtro = request.GET.get('tipo', '')
+    if tipo_filtro:
+        documentos = [doc for doc in documentos if doc.tipo == tipo_filtro]
+
+    # Filtrar por prioridad si se proporciona
+    prioridad_filtro = request.GET.get('prioridad', '')  # Cambio a GET para consistencia
+    if prioridad_filtro:
+        documentos = [doc for doc in documentos if doc.prioridad == prioridad_filtro]
+
+    # Obtener todos los documentos para el conteo de estados
+    all_documentos = Documento.objects.all()
+    # Obtener todos los documentos aprobados, ordenados por fecha de emisión (más reciente primero)
+    documentos_aprobados = all_documentos.filter(estado='APROBADO', visado=True,visado_admin=True,interno=False).order_by('-fecha_emision')
+    documentos_denegados = all_documentos.filter(estado='DENEGADO')
+
+    # Contar los documentos en cada categoría
+    count_pendientes = len(documentos)
+    count_aprobados = documentos_aprobados.count()
+    count_denegados = documentos_denegados.count()
+
+    # Preparar el contexto para pasar a la plantilla
+    context = {
+        'documentos': documentos,
+        'documentos_aprobados': documentos_aprobados,
+        'documentos_denegados': documentos_denegados,
+        'count_pendientes': count_pendientes,
+        'count_aprobados': count_aprobados,
+        'count_denegados': count_denegados,
+        'tipos_documento': Documento.TIPOS_DOCUMENTO,
+        'estados_documento': Documento.ESTADOS_DOCUMENTO,
+        'prioridad_dict': prioridad_map,  
+        'rol': rol_usuario
+    }
+    return render(request, 'gerente_home.html',context)
 
 def visar_documento(request):
     if request.method == 'POST':
@@ -233,7 +325,7 @@ def tesoreria_home(request):
     area = request.GET.get('area', '')
 
     # Consulta base de documentos aprobados
-    documentos_aprobados = Documento.objects.filter(estado='APROBADO').order_by('-fecha_recepcion')
+    documentos_aprobados = Documento.objects.filter(estado='APROBADO', interno=False).order_by('-fecha_recepcion')
 
     # Aplicar filtros si se proporcionan
     if sede:
@@ -246,7 +338,7 @@ def tesoreria_home(request):
         documentos_aprobados = documentos_aprobados.filter(usuario__roles__area=area)
 
     # Obtener los documentos por pagar (sin filtro adicional)
-    documentos_por_pagar = Documento.objects.filter(estado='APROBADO', pagado=False).order_by('-fecha_recepcion')
+    documentos_por_pagar = Documento.objects.filter(estado='APROBADO', pagado=False, interno=False).order_by('-fecha_recepcion')
     cantidad_documentos_por_pagar = documentos_por_pagar.count()
 
     # Obtener los tipos y áreas disponibles (si son dinámicos)
@@ -307,8 +399,9 @@ def registrar_view(request):
 @login_required(login_url='/login/')
 def admin_view(request):
     # Verificar si el usuario es ADMIN
-    if not request.user.roles.rol == 'ADMIN':
-        return redirect('home')
+    # Verificar si el usuario tiene un rol antes de acceder a él
+    if not hasattr(request.user, 'roles') or request.user.roles is None or request.user.roles.rol != 'ADMIN':
+        return redirect('login')
 
     rol_usuario = request.user.roles.rol  # Acceso directo al rol del usuario
 
@@ -323,18 +416,21 @@ def admin_view(request):
     documentos_alta = Documento.objects.filter(
         estado='PENDIENTE',
         visado=True,
+        visado_admin=False,
         prioridad='ALTA'
     ).order_by('fecha_emision')  # Ordenar por fecha de emisión (del más antiguo al más reciente)
 
     documentos_media = Documento.objects.filter(
         estado='PENDIENTE',
         visado=True,
+        visado_admin=False,
         prioridad='MEDIA'
     ).order_by('fecha_emision')
 
     documentos_baja = Documento.objects.filter(
         estado='PENDIENTE',
         visado=True,
+        visado_admin=False,
         prioridad='BAJA'
     ).order_by('fecha_emision')
 
@@ -672,6 +768,7 @@ def rechazar_documento(request):
         # Rechazar el documento
         documento.estado = 'DENEGADO'
         documento.observacion = observacion
+        documento.visado_admin = False
         documento.save()
 
         # Obtener el rol del usuario
@@ -681,11 +778,15 @@ def rechazar_documento(request):
         if user_role == 'ADMIN':
             messages.success(request, 'Documento rechazado correctamente.')
             return redirect('admin_home')
+        elif user_role == 'GERENTE':
+            messages.success(request, 'Documento rechazado correctamente.')
+            return redirect('gerente_home')
         else:
             messages.success(request, 'Documento rechazado correctamente.')
             return redirect('usuario_home')
 
     return redirect('usuario_home')
+
 
 def subsanar_documento(request):
     if request.method == 'POST':
@@ -746,22 +847,33 @@ def aprobar_documento(request):
             return redirect('documentos')  # Redirige a la página de documentos o al origen del formulario
 
         documento = get_object_or_404(Documento, id=documento_id)
-
-        # Verificar si el usuario tiene el rol adecuado
+        # Obtener el valor de 'enviarOpcion'
+        enviarOpcion = request.POST.get('enviarOpcion')
+        print("Valor de enviarOpcion:", enviarOpcion)
+        
         try:
             rol_usuario = RolesUsuario.objects.get(user=request.user)
             if rol_usuario.rol == 'ADMIN':
+                # Según la opción seleccionada, ajustar valores previos
+                if enviarOpcion == 'tesoreria':
+                    documento.estado = 'APROBADO'
+                    documento.fecha_recepcion = datetime.now()
+                elif enviarOpcion == 'gerencia':
+                    documento.fecha_recepcion = datetime.now()
+                    documento.visado_admin = True
+                elif enviarOpcion == 'interna':  # Nueva opción para Aprobación Interna
+                    documento.fecha_recepcion = datetime.now()
+                    documento.visado_admin = True
+                    documento.interno = True
+                    documento.estado = 'APROBADO'
+
+
                 # Obtener la firma digital del usuario actual
                 firma_digital = FirmaDigital.objects.filter(usuario=request.user).first()
                 if firma_digital and firma_digital.firma_digital:
                     print(f"Firma digital encontrada: {firma_digital.firma_digital.path}")
 
-                    # Aprobar el documento y firmarlo
-                    documento.estado = 'APROBADO'
-                    documento.fecha_recepcion = datetime.now()
-                    print(f"Estado del documento antes de firmar: {documento.estado}")
-
-                    # Leer el documento original
+                    # Proceso de firma: leer el documento original
                     existing_pdf = PdfReader(open(documento.archivo.path, "rb"))
                     output = PdfWriter()
 
@@ -769,31 +881,31 @@ def aprobar_documento(request):
                     packet = io.BytesIO()
                     can = canvas.Canvas(packet, pagesize=letter)
                     
-                    # Establecer rendición en False si el tipo es REQ
+                    # Si el tipo es REQ, marcar rendición en False
                     if documento.tipo == 'REQ':
                         documento.rendicion = False
                         
                     # Coordenadas de la firma según el tipo de documento
                     if documento.tipo == 'FUT':
-                        x = 450
+                        x = 232
                         y = 60
                     else:
-                        x = 612 - 160  # Ajustar 'x' para que quede cerca del borde derecho (612 es el ancho de la página en puntos)
-                        y = 792 - 80   # Ajustar 'y' para que quede cerca del borde superior (792 es la altura de la página en puntos)
+                        x = 270  # Coordenada ajustada
+                        y = 640      # Coordenada ajustada
                     
                     width = 150    # Ancho de la firma
-                    height = 80    # Alto de la firma
+                    height = 93    # Alto de la firma
 
-                    can.drawImage(firma_digital.firma_digital.path, x, y, width, height)
+                    can.drawImage(firma_digital.firma_digital.path, x, y, width, height, mask='auto')
                     can.save()
 
                     packet.seek(0)
                     overlay_pdf = PdfReader(packet)
 
-                    # Añadir el overlay al documento original
+                    # Añadir el overlay a cada página del PDF original (solo en la primera se aplica la firma)
                     for i in range(len(existing_pdf.pages)):
                         page = existing_pdf.pages[i]
-                        if i == 0:  # Añadir la firma solo en la primera página
+                        if i == 0:
                             page.merge_page(overlay_pdf.pages[0])
                         output.add_page(page)
 
@@ -817,7 +929,10 @@ def aprobar_documento(request):
 
                     documento.save()
 
-                    messages.success(request, 'Documento aprobado con éxito.')
+                    if enviarOpcion == 'tesoreria':
+                        messages.success(request, 'Documento aprobado y mandado a tesoreria.')
+                    elif enviarOpcion == 'gerencia':
+                        messages.success(request, 'Documento mandado a gerencia.')
                 else:
                     messages.error(request, 'Falta la firma digital para aprobar el documento.')
             else:
@@ -827,6 +942,101 @@ def aprobar_documento(request):
 
     return redirect('admin_home')
 
+
+
+
+@login_required
+def aprobar_documento_gerente(request):
+    if request.method == 'POST':
+        documento_id = request.POST.get('documento_id')
+        if not documento_id:
+            messages.error(request, 'No se ha especificado un documento para aprobar.')
+            return redirect('documentos')  # Redirige a la página de documentos o al origen del formulario
+
+        documento = get_object_or_404(Documento, id=documento_id)
+
+        # Verificar si el usuario tiene el rol adecuado
+        try:
+            rol_usuario = RolesUsuario.objects.get(user=request.user)
+            if rol_usuario.rol == 'GERENTE':
+                # Obtener la firma digital del usuario actual
+                firma_digital = FirmaDigital.objects.filter(usuario=request.user).first()
+                if firma_digital and firma_digital.firma_digital:
+                    # Aprobar el documento y firmarlo
+                    documento.estado = 'APROBADO'
+                    documento.fecha_aprobacion = datetime.now()
+                    print(f"Estado del documento antes de firmar: {documento.estado}")
+
+                    # Verificar si existe el archivo firmado
+                    if documento.archivo_firmado:
+                        existing_pdf = PdfReader(open(documento.archivo_firmado.path, "rb"))
+                    else:
+                        messages.error(request, 'Error: archivo_no firmado, contacte al programador.')
+                        return redirect('gerente_home')
+
+                    output = PdfWriter()
+
+                    # Crear el overlay con la firma
+                    packet = io.BytesIO()
+                    can = canvas.Canvas(packet, pagesize=letter)
+                    
+                    # Establecer rendición en False si el tipo es REQ
+                    if documento.tipo == 'REQ':
+                        documento.rendicion = False
+                        
+                    # Coordenadas de la firma según el tipo de documento
+                    if documento.tipo == 'FUT':
+                        x = 427
+                        y = 792 - 80
+                    else:
+                        x = 427  # Ajustar 'x' para que quede cerca del borde derecho (612 es el ancho de la página en puntos)
+                        y = 640   # Ajustar 'y' para que quede cerca del borde superior (792 es la altura de la página en puntos)
+                    
+                    width = 150    # Ancho de la firma
+                    height = 80    # Alto de la firma
+
+                    can.drawImage(firma_digital.firma_digital.path, x, y, width, height, mask='auto')
+                    can.save()
+
+                    packet.seek(0)
+                    overlay_pdf = PdfReader(packet)
+
+                    # Añadir el overlay al documento original
+                    for i in range(len(existing_pdf.pages)):
+                        page = existing_pdf.pages[i]
+                        if i == 0:  # Añadir la firma solo en la primera página
+                            page.merge_page(overlay_pdf.pages[0])
+                        output.add_page(page)
+
+                    # Crear el directorio si no existe
+                    output_dir = os.path.join(settings.MEDIA_ROOT, 'documentos_firmados_gerente')
+                    os.makedirs(output_dir, exist_ok=True)
+
+                    # Guardar el documento firmado en un archivo temporal
+                    signed_pdf_path = os.path.join(output_dir, os.path.basename(documento.archivo_firmado.name))
+                    with open(signed_pdf_path, "wb") as outputStream:
+                        output.write(outputStream)
+
+                    print(f"Documento firmado guardado en: {signed_pdf_path}")
+
+                    # Asignar el archivo firmado por gerente al campo del modelo
+                    with open(signed_pdf_path, "rb") as f:
+                        documento.archivo_firmado_gerente.save(os.path.basename(signed_pdf_path), File(f), save=False)
+
+                    # Eliminar el archivo temporal
+                    os.remove(signed_pdf_path)
+
+                    documento.save()
+
+                    messages.success(request, 'Documento aprobado con éxito.')
+                else:
+                    messages.error(request, 'Falta la firma digital para aprobar el documento.')
+            else:
+                messages.error(request, 'No tienes permisos para aprobar documentos.')
+        except RolesUsuario.DoesNotExist:
+            messages.error(request, 'No se pudo encontrar el rol del usuario.')
+
+    return redirect('gerente_home')
 
 def salir(request):
     logout(request)
@@ -842,12 +1052,24 @@ def subir_firma_digital(request):
                 firma.firma_digital = firma_digital
                 firma.save()
                 messages.success(request, 'Firma digital subida con éxito.')
-                return redirect('admin_home')
+                
+                # Obtener el rol del usuario
+                rol_usuario = request.user.roles.rol  # Accede al rol
+                
+                # Redirigir según el rol
+                if rol_usuario == 'ADMIN':
+                    return redirect('admin_home')
+                elif rol_usuario == 'GERENTE':
+                    return redirect('gerente_home')
+                else:
+                    return redirect('login')  # Redirección por defecto
+                
             else:
                 messages.error(request, 'Formato de archivo no válido. Solo se permiten imágenes PNG y JPEG.')
         else:
             messages.error(request, 'No se ha seleccionado ningún archivo.')
-    return redirect('admin_home')
+    
+    return redirect('login')  # Redirección por defecto en caso de error
 
 def update_priorities(request):
     if request.method == 'POST':

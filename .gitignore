@@ -1,4 +1,7 @@
 # Ignorar carpetas de documentos
+# Ignorar archivos y carpetas específicas
+.git/
+well-know/
 documentos/
 documentos_firmados/
 documentos_rendicion/
@@ -6,6 +9,3 @@ documentos_visados/
 
 # Ignorar archivos PDF en cualquier parte del proyecto
 *.pdf
-
-# Ignorar base de datos SQLite
-*.sqlite3

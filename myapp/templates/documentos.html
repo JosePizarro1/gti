@@ -14,8 +14,65 @@
         font-size: 0.85rem; /* Reduce el tamaño en pantallas pequeñas */
     }
 }
+.timeline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 15px;
+}
+
+.timeline-step {
+    text-align: center;
+    position: relative;
+    width: 100%;
+    max-width: 250px;
+    margin-bottom: 0px;
+    transition: all 0.3s ease-in-out;
+}
+
+.timeline-step i {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #ddd, #bbb);
+    padding: 15px;
+    border-radius: 50%;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-step.active i {
+    background: linear-gradient(135deg, #007bff, #0d6efd);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+}
+
+.timeline-step p {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    transition: color 0.3s ease-in-out;
+}
+
+.timeline-line {
+    width: 5px;
+    height: 60px;
+    background: linear-gradient(180deg, #ddd, #aaa);
+    transition: background 0.3s ease-in-out, height 0.3s ease-in-out;
+}
+
+.timeline-step.active + .timeline-line {
+    background: linear-gradient(180deg, #0d6efd, #007bff);
+    height: 70px;
+}
 
 </style>
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <div class="mb-4">
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
@@ -57,8 +114,7 @@
                 <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Asunto</th>
                 <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Fecha de Emisión</th>
                 <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Estado</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Pagado</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Visado</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Proceso</th>
                 <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Acciones</th>
             </tr>
         </thead>
@@ -68,7 +124,7 @@
                     <td class="px-4 py-2 whitespace-nowrap">{{ documento.id }}</td>
                     <td class="px-4 py-2 whitespace-nowrap">{{ documento.usuario.get_full_name }}</td>
                     <td class="px-4 py-2 whitespace-nowrap">{{ documento.tipo }}</td>
-                    <td class="px-4 py-2 whitespace-nowrap">{{ documento.asunto }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap" >{{ documento.asunto }}</td>
                     <td class="px-4 py-2 whitespace-nowrap">{{ documento.fecha_emision|date:"d/m/Y H:i" }}</td>
                     <td class="px-4 py-2 whitespace-nowrap">
                         {% if documento.estado == 'DENEGADO' %}
@@ -80,19 +136,62 @@
                         {% endif %}
                     </td>
                     <td class="px-4 py-2 text-center">
-                        {% if documento.pagado %}
-                            <i class="fas fa-check text-green-600"></i>
-                        {% else %}
-                            <i class="fas fa-times text-red-600"></i>
-                        {% endif %}
+                    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#procesoModal{{ documento.id }}">
+                        <i class="fas fa-tasks"></i>
+                    </button>
+<div class="modal fade" id="procesoModal{{ documento.id }}" tabindex="-1" aria-labelledby="procesoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Proceso del Documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="timeline">
+                    <!-- Documento Subido -->
+                    <div class="timeline-step active" data-aos="fade-up">
+                        <i class="fas fa-file-alt"></i>
+                        <p>Documento Subido</p>
+                    </div>
+                    <div class="timeline-line"></div>
+
+                    <!-- Jefe de Área -->
+                    <div class="timeline-step {% if documento.visado == False and documento.estado == 'PENDIENTE' or documento.visado or documento.visado_admin or documento.archivo_firmado or documento.estado == 'APROBADO' %} active {% endif %}" data-aos="fade-up">
+                        <i class="fas fa-user-tie"></i>
+                        <p>Jefe de Área</p>
+                    </div>
+                    <div class="timeline-line"></div>
+
+                    <!-- Administrador -->
+                    <div class="timeline-step {% if documento.visado == True and documento.estado == 'PENDIENTE' or documento.visado_admin or documento.archivo_firmado or documento.estado == 'APROBADO' %} active {% endif %}" data-aos="fade-up">
+                        <i class="fas fa-user-shield"></i>
+                        <p>Administrador</p>
+                    </div>
+
+                    {% if not documento.interno %}
+                    <div class="timeline-line"></div>
+
+                    <!-- Gerente -->
+                    <div class="timeline-step {% if documento.archivo_firmado and documento.visado_admin and documento.estado == 'PENDIENTE' or documento.estado == 'APROBADO' %} active {% endif %}" data-aos="fade-up">
+                        <i class="fas fa-briefcase"></i>
+                        <p>Gerente</p>
+                    </div>
+                    <div class="timeline-line"></div>
+
+                    <!-- Tesorería -->
+                    <div class="timeline-step {% if documento.estado == 'APROBADO' %} active {% endif %}">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <p>Tesorería</p>
+                    </div>
+                    {% endif %}                  
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                     </td>
-                    <td class="px-4 py-2 text-center">
-                        {% if documento.visado %}
-                            <i class="fas fa-check text-green-600"></i>
-                        {% else %}
-                            <i class="fas fa-times text-red-600"></i>
-                        {% endif %}
-                    </td>
+                    
                     <td class="action-icons text-center align-middle">
                     {% if documento.rendicion %}
                         {% if documento.archivo_rendicion %}
@@ -122,17 +221,33 @@
                             <a href="{{ documento.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800" title="Ver Archivo">
                                 <i class="fas fa-eye"></i>
                             </a>
-                        {% elif documento.estado == 'APROBADO' and documento.archivo_firmado %}
-                            <a href="{{ documento.archivo_firmado.url }}" class="text-green-600 hover:text-green-800" title="Descargar Archivo" download>
-                                <i class="fas fa-download"></i>
-                            </a>
+                        {% elif documento.estado == 'APROBADO' %}
+                            {% if documento.visado_admin %}
+                                 <!-- En caso de que visado_admin sea true, se usa archivo_firmado_gerencia -->
+                                 <a href="{{ documento.archivo_firmado.url }}" class="text-green-600 hover:text-green-800" title="Descargar Archivo" download>
+                                     <i class="fas fa-download"></i>
+                                 </a>
+                                 <a href="{{ documento.archivo_firmado.url }}" class="text-green-600 hover:text-green-800" title="Ver Archivo" target="_blank">
+                                     <i class="fas fa-eye"></i>
+                                 </a>
+                            {% else %}
+                                 <!-- En caso de que visado_admin sea false, se usa archivo_firmado -->
+                                 <a href="{{ documento.archivo_firmado.url }}" class="text-green-600 hover:text-green-800" title="Descargar Archivo" download>
+                                     <i class="fas fa-download"></i>
+                                 </a>
+                                 <a href="{{ documento.archivo_firmado.url }}" class="text-green-600 hover:text-green-800" title="Ver Archivo" target="_blank">
+                                     <i class="fas fa-eye"></i>
+                                 </a>
+                            {% endif %}
                         {% endif %}
+
                                                                         <!-- Mostrar Fechas -->
                         <button class="btn btn-info btn-sm text-white shadow-none border-0" title="Ver Fechas"
                                     onclick="mostrarFechas('{{ documento.fecha_recepcion }}', '{{ documento.fecha_emision }}')">
                                 <i class="fas fa-calendar-alt"></i>
                         </button>
                     </td>
+  
                 </tr>
             {% empty %}
                 <tr>
@@ -211,6 +326,13 @@
         </div>
     </div>
 </div>
+<script>
+    AOS.init({
+        duration: 1000,
+        easing: "ease-in-out",
+        once: true
+    });
+</script>
 
 <script>
     $(document).ready(function() {

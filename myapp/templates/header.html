@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+
     <style>
         .header {
             background-color: #255A9E;
@@ -41,15 +43,19 @@
     </style>
 </head>
 <body>
+    
 <nav class="navbar navbar-expand-lg header">
     <a class="navbar-brand" href="#">EGATUR</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
+            <!-- User Dropdown -->
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
+                   aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-user"></i>
                     <span class="d-none d-md-inline"> Bienvenido, {{ user.get_full_name }}</span>
                 </a>
@@ -78,9 +84,13 @@
                         <a class="dropdown-item" href="{% url 'memo_view' %}">
                             <i class="fas fa-file-alt"></i> Memo
                         </a>
-                         
-                        
-                        
+                    {% elif rol == 'GERENTE' %}
+                        <a class="dropdown-item" href="{% url 'gerente_home' %}">
+                            <i class="fas fa-dollar-sign"></i> Gerente
+                        </a>
+                        <a class="dropdown-item" href="{% url 'usuario_home' %}">
+                            <i class="fas fa-user"></i> Usuario
+                        </a>                        
                     {% else %}
                         <a class="dropdown-item" href="{% url 'usuario_home' %}">
                             <i class="fas fa-user"></i> Usuario
@@ -95,6 +105,59 @@
                     </a>
                 </div>
             </li>
+<!-- Alerts Dropdown (Modificaciones) -->
+<li class="nav-item dropdown no-arrow mx-1">
+    <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+       
+       <!-- Animación Lottie en lugar del ícono estático -->
+       <dotlottie-player src="https://lottie.host/3669315e-4e17-4644-8bdd-cf114d2e6748/dgx5EHbqh8.lottie"
+                         background="transparent" speed="1"
+                         style="width: 30px; height: 30px; display: inline-block; vertical-align: middle;"
+                         loop autoplay>
+       </dotlottie-player>
+
+    </a>
+
+    <!-- Dropdown - Alerts -->
+    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+         aria-labelledby="alertsDropdown">
+        <!-- Header con fondo azul -->
+        <div style="background-color: #255A9E; color: #fff; padding: 0.75rem 1.25rem;">
+            Notificaciones
+        </div>
+        <!-- Contenido con fondo blanco -->
+        <div>
+            <a class="dropdown-item d-flex align-items-center" href="#" style="background-color: #fff; color: #3a3b45;">
+                <div class="mr-3">
+                    <div class="icon-circle" style="background-color: #fff;">
+                        <i class="fas fa-file-alt" style="color: #1E7BB8;"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="small" style="color: #b7b9cc;">Actualización 1: 2025</div>
+                    <span class="font-weight" style="color: #3a3b45;">Ahora todos los documentos deben ser con el Formato Word indicado.</span>
+                </div>
+            </a>
+            <a class="dropdown-item d-flex align-items-center" href="#" style="background-color: #fff; color: #3a3b45;">
+                <div class="mr-3">
+                    <div class="icon-circle" style="background-color: #fff;">
+                        <i class="fas fa-file-alt" style="color: #1E7BB8;"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="small" style="color: #b7b9cc;">Actualización 2: 2025</div>
+                    <span class="font-weight" style="color: #3a3b45;">Se han implementado mejoras en el sistema.</span>
+                </div>
+            </a>
+            <a class="dropdown-item text-center small" href="#" style="background-color: #fff; color: #3a3b45;">
+                Mostrar todo
+            </a>
+        </div>
+    </div>
+</li>
+
+
         </ul>
     </div>
 </nav>

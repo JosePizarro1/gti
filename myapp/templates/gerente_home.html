@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerente - Documentos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background-color: #255A9E;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+        }
+        .container {
+            background-color: white;
+            color: #255A9E;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+        .btn-view, .btn-download {
+            color: #28a745;
+        }
+        .btn-view:hover, .btn-download:hover {
+            color: #218838;
+        }
+        .btn-download {
+            color: #007bff;
+        }
+        .btn-download:hover {
+            color: #0056b3;
+        }
+        .estado-denegado {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .estado-aprobado {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .estado-pendiente {
+            background-color: #ffc107;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .prioridad-alta {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .prioridad-media {
+            background-color: #ffc107;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .prioridad-baja {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .collapse-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .collapse-btn .fas {
+            margin-left: 10px;
+            transition: transform 0.3s;
+        }
+        .collapse-btn.collapsed .fas {
+            transform: rotate(180deg);
+        }
+    </style>
+    
+    {% include 'header.html' %}
+</head>
+<body>
+    <div class="container mt-5">
+<div class="flex justify-center mb-8">
+  <div class="bg-blue-500 text-white p-4 rounded-lg shadow-md flex flex-col items-center" style="width: 300px;">
+    <i class="fas fa-clock text-4xl mb-2"></i>
+    <h5 class="text-xl font-semibold">Pendientes</h5>
+    <p class="text-2xl">{{ count_pendientes }}</p>
+  </div>
+</div>
+
+
+                        <!-- Botón para mostrar/ocultar documentos por revisar -->
+        <button id="toggleButtonRevisar" class="btn btn-dark mb-3 collapse-btn">
+                    Documentos aprobados <i class="fas fa-chevron-down"></i>
+        </button>
+                <!-- Sección colapsable de Documentos por Revisar -->
+        <div id="documentosPorRevisarSection" style="display: none;">
+                    {% include 'documentos_aprobados.html' %}
+        </div> 
+        
+        
+        
+        <!-- Botón para mostrar/ocultar documentos (ABIERTO POR DEFECTO) -->
+        <button id="toggleButton" class="btn btn-primary mb-3 collapse-btn">
+            Documentos <i class="fas fa-chevron-up"></i>
+        </button>
+        <div id="documentosSection" style="display: block;">
+            {% include 'documentos_gerente.html' %}
+        </div>
+      
+
+        
+        
+        
+                   {% include 'mensajes.html' %}
+ 
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {      
+            $("#toggleButtonRevisar").click(function() {
+                $("#documentosPorRevisarSection").toggle(500);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var section = document.getElementById('documentosSection');
+            var chevron = document.querySelector('#toggleButton .fas');
+
+            // Asegurar que la sección esté abierta al cargar
+            section.style.display = 'block';
+            chevron.classList.remove('fa-chevron-down');
+            chevron.classList.add('fa-chevron-up');
+
+            document.getElementById('toggleButton').addEventListener('click', function () {
+                if (section.style.display === 'none') {
+                    section.style.display = 'block';
+                    chevron.classList.remove('fa-chevron-down');
+                    chevron.classList.add('fa-chevron-up');
+                } else {
+                    section.style.display = 'none';
+                    chevron.classList.remove('fa-chevron-up');
+                    chevron.classList.add('fa-chevron-down');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

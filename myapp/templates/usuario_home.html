@@ -79,21 +79,37 @@
     <div class="container mx-auto mt-5 p-5 bg-white rounded-lg shadow-lg">
         
         
-        {% if user.roles.es_jefe_area or user.roles.area == "ACADEMICA" %}
-        <div class="absolute top-25 right-5">
-            {% if ultimo_formato %}
-                <a href="{{ ultimo_formato.archivo.url }}" class="flex flex-col items-center bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg shadow-lg transition duration-300">
-                    <i class="fas fa-file-word text-5xl"></i>
-                    <span class="text-sm mt-1">Descargar formato Word</span>
-                </a>
-            {% else %}
-                <button class="flex flex-col items-center bg-gray-400 text-white py-3 px-4 rounded-lg shadow-lg" disabled>
-                    <i class="fas fa-file-word text-5xl"></i>
-                    <span class="text-sm mt-1">No hay formatos disponibles</span>
-                </button>
-            {% endif %}
-        </div>
-    {% endif %}
+{% if user.roles.es_jefe_area or user.roles.area == "ACADEMICA" %}
+    <div class="absolute top-25 right-5">
+        {% if ultimo_formato %}
+            <a href="{{ ultimo_formato.archivo.url }}" class="flex flex-col items-center bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg shadow-lg transition duration-300">
+                <!-- Animación Lottie en lugar del icono de archivo -->
+                <dotlottie-player src="https://lottie.host/a3651d8e-8330-4d8a-9efb-7242080437fd/HiPsvZMfAG.json" 
+                                  background="transparent" 
+                                  speed="1" 
+                                  style="width: 80px; height: 80px;" 
+                                  loop autoplay>
+                </dotlottie-player>
+                <span class="text-sm mt-1">Descargar formato Word</span>
+            </a>
+        {% else %}
+            <button class="flex flex-col items-center bg-gray-400 text-white py-3 px-4 rounded-lg shadow-lg" disabled>
+                <!-- Animación Lottie desactivada para indicar que no hay archivo -->
+                <dotlottie-player src="https://lottie.host/a3651d8e-8330-4d8a-9efb-7242080437fd/HiPsvZMfAG.json" 
+                                  background="transparent" 
+                                  speed="1" 
+                                  style="width: 80px; height: 80px; filter: grayscale(100%);" 
+                                  loop autoplay>
+                </dotlottie-player>
+                <span class="text-sm mt-1">No hay formatos disponibles</span>
+            </button>
+        {% endif %}
+    </div>
+{% endif %}
+
+<!-- Importar DotLottie Player -->
+<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+
 
 
         <!-- Contenedor de Cards -->

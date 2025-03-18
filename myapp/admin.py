@@ -3,11 +3,12 @@ from django.contrib.auth.models import User
 from .models import Documento, RolesUsuario, FirmaDigital, Memo,Formato  # Importamos Memo
 
 class DocumentoAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'tipo', 'estado', 'fecha_emision', 'fecha_recepcion', 
-                    'archivo_firmado', 'pagado', 'visado', 'emitido_por_jefe')  # Agregamos emitido_por_jefe como columna
-    list_filter = ('estado', 'tipo', 'pagado', 'visado', 'emitido_por_jefe')  # Permite filtrar por emitido_por_jefe
-    search_fields = ('usuario__username', 'tipo', 'estado', 'pagado', 'visado')  # Campo de búsqueda
-    ordering = ('-fecha_emision',)  # Orden descendente por fecha de emisión
+    list_display = ('id', 'usuario', 'tipo', 'estado', 'fecha_emision', 'fecha_recepcion', 
+                    'archivo_firmado', 'pagado', 'visado', 'emitido_por_jefe')
+    list_filter = ('estado', 'tipo', 'pagado', 'visado', 'emitido_por_jefe')
+    search_fields = ('usuario__username', 'tipo', 'estado', 'pagado', 'visado')
+    ordering = ('-fecha_emision',)
+
 
 class RolesUsuarioAdmin(admin.ModelAdmin):
     list_display = ('nombre_completo', 'rol', 'sede', 'area', 'es_jefe_area')

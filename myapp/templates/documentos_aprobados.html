@@ -11,6 +11,12 @@
 }
 
        </style>
+       <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <!-- Tabla de Documentos -->
 <!-- Contenedor de la tabla -->
 <div class="overflow-x-auto mt-3">
@@ -63,33 +69,28 @@
 
 
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-var table =             $('#documentosTable1').DataTable({
-"language": {
-    "search": "Buscar:",
-    "paginate": {
-        "next": "Siguiente",
-        "previous": "Anterior"
-    },
-    "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-    "infoEmpty": "No hay entradas para mostrar",
-    "infoFiltered": "(filtrado de _MAX_ entradas en total)",
-    "lengthMenu": "Mostrar _MENU_ entradas",
-    "zeroRecords": "No se encontraron registros",
-    "emptyTable": "No hay datos disponibles en la tabla",
-    "loadingRecords": "Cargando...",
-    "processing": "Procesando...",
-    "searchPlaceholder": "Buscar..."
-},
-"order": [[1, "desc"]] // Ordena por la columna de fecha de emisión (columna 3) de manera descendente
-
+$(document).ready(function() {
+    var table = $('#documentosTable1').DataTable({
+        "language": {
+            "search": "Buscar:",
+            "paginate": {
+                "next": "Siguiente",
+                "previous": "Anterior"
+            },
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+            "infoEmpty": "No hay entradas para mostrar",
+            "infoFiltered": "(filtrado de _MAX_ entradas en total)",
+            "lengthMenu": "Mostrar _MENU_ entradas",
+            "zeroRecords": "No se encontraron registros",
+            "emptyTable": "No hay datos disponibles en la tabla",
+            "loadingRecords": "Cargando...",
+            "processing": "Procesando...",
+            "searchPlaceholder": "Buscar..."
+        },
+        "order": [[0, "desc"]] // Ordena por la columna ID en orden descendente
+    });
 });
 
 </script>
@@ -99,7 +100,7 @@ function mostrarFechas(fechaRecepcion, fechaEmision) {
         title: 'Detalles de Fechas',
         html: `
             <div style="text-align: center; font-size: 18px; line-height: 1.6;">
-                <p><strong>📅 Fecha de Recepcion:</strong><br> ${fechaRecepcion ? fechaRecepcion : 'No disponible'}</p>
+                <p><strong>📅 Fecha de Aprobacion Administracion:</strong><br> ${fechaRecepcion ? fechaRecepcion : 'No disponible'}</p>
                 <p><strong>📄 Fecha de Emision:</strong><br> ${fechaEmision ? fechaEmision : 'No disponible'}</p>
             </div>
         `,

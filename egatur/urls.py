@@ -13,6 +13,7 @@ urlpatterns = [
     path('register/', registrar_view, name='register'), 
     path('admin_home/', admin_view, name='admin_home'),
     path('secretaria_home/', secretaria_home_view, name='secretaria_home'),
+    path('gerente_home/', gerente_home, name='gerente_home'),
     path('usuario_home/', usuario_home_view, name='usuario_home'),
     path('subir_documento/', subir_documento_view, name='subir_documento'),
     path('rechazar_documento/', rechazar_documento, name='rechazar_documento'),
@@ -20,8 +21,10 @@ urlpatterns = [
     path('visar_documento/', visar_documento, name='visar_documento'),
 
     path('aprobar_documento/', aprobar_documento, name='aprobar_documento'),
+    path('aprobar_documento_gerente/', aprobar_documento_gerente, name='aprobar_documento_gerente'),
     
     path('marcar-leido/<int:memo_id>/', marcar_leido, name='marcar_leido'),
+    path('cambiar-contrasena/', cambiar_contrasena, name='cambiar_contrasena'),
 
     
 

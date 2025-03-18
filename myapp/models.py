@@ -14,7 +14,8 @@ ROLES_USUARIO = [
     ('ADMIN', 'Admin'),
     ('SECRETARIA', 'Secretaria'),
     ('USUARIO', 'Usuario'),
-    ('TESORERIA', 'Tesorería')
+    ('TESORERIA', 'Tesorería'),
+    ('GERENTE', 'Gerente')  # Nuevo rol agregado
 ]
 class Formato(models.Model):
     archivo = models.FileField(upload_to='formatos/', verbose_name="Archivo de Formato")
@@ -50,7 +51,8 @@ AREAS_OPCIONES = [
     ('MARKETING_FOCUS', 'Área Marketing Focus'),
     ('PRACTICANTE', 'Practicante'),
     ('GERENCIA','Gerencia'),
-    ('OPERATIVA','Operativa')
+    ('OPERATIVA','Operativa'),
+    ('SIN_AREA', 'Sin Área')  # Nueva opción agregada
 ]
 
 class RolesUsuario(models.Model):
@@ -110,26 +112,30 @@ class Documento(models.Model):
         ('DENEGADO', 'Denegado')
     ]
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documentos')
-    tipo = models.CharField(max_length=3, choices=TIPOS_DOCUMENTO)
+    tipo = models.CharField(max_length=10, choices=TIPOS_DOCUMENTO)
     archivo = models.FileField(upload_to='documentos/')
     archivo_firmado = models.FileField(upload_to='documentos_firmados/', null=True, blank=True)
     archivo_rendicion = models.FileField(upload_to='documentos_rendicion/', null=True, blank=True)  # Nuevo campo
+    archivo_firmado_gerente = models.FileField(upload_to='documentos_firmados_gerente/', null=True, blank=True)
 
     
     fecha_emision = models.DateTimeField(auto_now_add=True)
     fecha_recepcion = models.DateTimeField(null=True, blank=True)
     fecha_rendicion = models.DateTimeField(null=True, blank=True)  # Nuevo campo
+    fecha_aprobacion = models.DateTimeField(null=True, blank=True)  # Nuevo campo para la fecha de aprobación
 
 
     estado = models.CharField(max_length=9, choices=ESTADOS_DOCUMENTO, default='PENDIENTE')
     observacion = models.TextField(null=True, blank=True)
     pagado = models.BooleanField(default=False)  # Campo para indicar si el documento ha sido pagado
     visado = models.BooleanField(default=False)  # Nuevo campo para indicar si el documento ha sido visado
+    visado_admin = models.BooleanField(default=False)  # Nuevo campo para indicar si el documento ha sido visado
+    interno = models.BooleanField(default=False)  # si el doc es interno no se muestra en tesoreria
+
     prioridad = models.CharField(max_length=50, choices=PRIORIDADES_OPCIONES, default='BAJA')  # Prioridad del documento
     asunto = models.CharField(max_length=100, null=True, blank=True, default='Sin asunto')  # Nuevo campo 'asunto'
     emitido_por_jefe = models.BooleanField(default=False)  # Indica si el documento fue emitido por un jefe
     rendicion = models.BooleanField(null=True, blank=True)  # Nuevo campo
-    fecha_aprobacion = models.DateTimeField(null=True, blank=True)  # Nuevo campo para la fecha de aprobación
 
     def __str__(self):
         return f'{self.get_tipo_display()} - {self.usuario.username}'
