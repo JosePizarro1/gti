@@ -38,53 +38,74 @@
         </form>
         
     </div>
-    
     <script>
-        $(document).ready(function() {
-            // Función para actualizar el placeholder del campo "Asunto" dependiendo del tipo de documento seleccionado
-            function actualizarPlaceholder(tipoSeleccionado) {
-                // Cambiar el placeholder dependiendo del tipo seleccionado
-                if (tipoSeleccionado === 'FUT') {
-                    $('#asunto').attr('placeholder', 'Asunto');
-                } else if (tipoSeleccionado === 'REQ') {
-                    $('#asunto').attr('placeholder', 'Ingrese su número de req');
-                } else if (tipoSeleccionado === 'INF') {
-                    $('#asunto').attr('placeholder', 'Ingrese su número de informe');
+    $(document).ready(function() {
+        // Función para actualizar el placeholder del campo "Asunto" dependiendo del tipo de documento seleccionado
+        function actualizarPlaceholder(tipoSeleccionado) {
+            if (tipoSeleccionado === 'FUT') {
+                $('#asunto').attr('placeholder', 'Asunto');
+            } else if (tipoSeleccionado === 'REQ') {
+                $('#asunto').attr('placeholder', 'Ingrese su número de req');
+            } else if (tipoSeleccionado === 'INF') {
+                $('#asunto').attr('placeholder', 'Ingrese su número de informe');
+            }
+        }
+
+        // Cambiar el placeholder al cargar la página por el valor por defecto
+        var tipoSeleccionado = $('#tipo').val();
+        actualizarPlaceholder(tipoSeleccionado);
+
+        // Cambiar el placeholder cuando el tipo de documento se cambia
+        $('#tipo').on('change', function() {
+            tipoSeleccionado = $(this).val();
+            actualizarPlaceholder(tipoSeleccionado);
+        });
+
+        // Validar la extensión del archivo seleccionado
+        $('#archivo').on('change', function() {
+            var file = this.files[0];  // Obtener el archivo seleccionado
+            if (file) {
+                var fileName = file.name;  // Nombre del archivo
+                var fileExtension = fileName.split('.').pop().toLowerCase();  // Obtener la extensión
+
+                if (fileExtension !== 'pdf') {
+                    // Mostrar alerta con SweetAlert
+                    Swal.fire({
+                        title: 'Formato no válido',
+                        text: 'Solo se permiten archivos en formato PDF.',
+                        icon: 'error',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Aceptar'
+                    });
+
+                    // Limpiar el campo de archivo
+                    $('#archivo').val('');
                 }
             }
+        });
 
-            // Cambiar el placeholder al cargar la página por el valor por defecto
-            var tipoSeleccionado = $('#tipo').val();
-            actualizarPlaceholder(tipoSeleccionado);
+        // Manejador del envío del formulario con SweetAlert
+        $('#uploadForm').on('submit', function(e) {
+            e.preventDefault();
 
-            // Cambiar el placeholder cuando el tipo de documento se cambia
-            $('#tipo').on('change', function() {
-                tipoSeleccionado = $(this).val(); // Obtener el valor seleccionado
-                actualizarPlaceholder(tipoSeleccionado);
-            });
-
-            // Manejador del envío del formulario con SweetAlert
-            $('#uploadForm').on('submit', function(e) {
-                e.preventDefault(); // Prevenir el envío normal del formulario
-
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: "¿Deseas subir este documento?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, subir',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Si se confirma, enviamos el formulario
-                        this.submit();
-                    }
-                });
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¿Deseas subir este documento?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, subir',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
             });
         });
-    </script>
+    });
+</script>
+
     
 </body>
 </html>

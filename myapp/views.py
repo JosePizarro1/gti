@@ -29,6 +29,8 @@ from .models import Memo,Formato
 import json
 import random
 import string
+from reportlab.lib import colors
+
 def cambiar_contrasena(request):
     if request.method == "POST":
         user_id = request.POST.get("usuario")
@@ -668,7 +670,8 @@ def usuario_home_view(request):
     
     
     
-    
+from django.utils.timezone import now
+
 from django.utils.text import slugify  # Alternativa para generar nombres de archivos limpios
 from unidecode import unidecode
 def subir_documento_view(request):
@@ -691,20 +694,27 @@ def subir_documento_view(request):
             is_academica = rol_usuario.area == 'ACADEMICA'
             is_operativa = rol_usuario.area == 'OPERATIVA'
             is_ventas = rol_usuario.area == 'VENTAS'  # Nueva verificación
+            is_admin_focus = rol_usuario.area == 'ADMINISTRACION_FOCUS'  # Nueva verificación
 
         except RolesUsuario.DoesNotExist:
             is_jefe = False
             is_academica = False
             is_operativa = False
             is_ventas = False
-    
+            is_admin_focus = False
+
         # Crear el documento
         documento = Documento(usuario=request.user, tipo=tipo, asunto=asunto, archivo=archivo)
         
         # Si es jefe, operativa o ventas, el documento queda visado automáticamente
         if is_jefe or is_operativa or is_ventas:
             documento.visado = True
-        
+        # Si pertenece al área ADMINISTRACION_FOCUS, se establece visado_admin y fecha_recepcion
+        if is_admin_focus:
+            documento.visado = True
+            documento.visado_admin = True
+            documento.fecha_recepcion = now()
+            
         documento.save()
         
         # Comportamiento según el tipo de documento
@@ -882,8 +892,19 @@ def aprobar_documento(request):
                     can = canvas.Canvas(packet, pagesize=letter)
                     
                     # Si el tipo es REQ, marcar rendición en False
-                    if documento.tipo == 'REQ':
+                    if documento.tipo == 'REQ' or documento.tipo == 'REQ-PAS':
                         documento.rendicion = False
+                        text = f"ID: {documento.id}"
+                        can.setFont("Helvetica-Bold", 12)
+                        # Medir el ancho del texto
+                        text_width = can.stringWidth(text, "Helvetica-Bold", 12)
+                        # Dibujar un rectángulo verde detrás del texto
+                        # Ajusta las coordenadas según necesites; aquí se deja 2 pts de margen a izquierda y arriba/abajo
+                        can.setFillColor(colors.green)
+                        can.rect(18, letter[1] - 42, text_width + 4, 16, fill=True, stroke=False)
+                        # Dibujar el texto en blanco sobre el rectángulo
+                        can.setFillColor(colors.white)
+                        can.drawString(20, letter[1] - 40, text)
                         
                     # Coordenadas de la firma según el tipo de documento
                     if documento.tipo == 'FUT':
@@ -971,8 +992,7 @@ def aprobar_documento_gerente(request):
                     if documento.archivo_firmado:
                         existing_pdf = PdfReader(open(documento.archivo_firmado.path, "rb"))
                     else:
-                        messages.error(request, 'Error: archivo_no firmado, contacte al programador.')
-                        return redirect('gerente_home')
+                        existing_pdf = PdfReader(open(documento.archivo.path, "rb"))
 
                     output = PdfWriter()
 
@@ -980,9 +1000,20 @@ def aprobar_documento_gerente(request):
                     packet = io.BytesIO()
                     can = canvas.Canvas(packet, pagesize=letter)
                     
-                    # Establecer rendición en False si el tipo es REQ
-                    if documento.tipo == 'REQ':
+                    # Si el tipo es REQ, marcar rendición en False
+                    if documento.tipo == 'REQ' or documento.tipo == 'REQ-PAS':
                         documento.rendicion = False
+                        text = f"ID: {documento.id}"
+                        can.setFont("Helvetica-Bold", 12)
+                        # Medir el ancho del texto
+                        text_width = can.stringWidth(text, "Helvetica-Bold", 12)
+                        # Dibujar un rectángulo verde detrás del texto
+                        # Ajusta las coordenadas según necesites; aquí se deja 2 pts de margen a izquierda y arriba/abajo
+                        can.setFillColor(colors.green)
+                        can.rect(18, letter[1] - 42, text_width + 4, 16, fill=True, stroke=False)
+                        # Dibujar el texto en blanco sobre el rectángulo
+                        can.setFillColor(colors.white)
+                        can.drawString(20, letter[1] - 40, text)
                         
                     # Coordenadas de la firma según el tipo de documento
                     if documento.tipo == 'FUT':
@@ -1013,7 +1044,14 @@ def aprobar_documento_gerente(request):
                     os.makedirs(output_dir, exist_ok=True)
 
                     # Guardar el documento firmado en un archivo temporal
-                    signed_pdf_path = os.path.join(output_dir, os.path.basename(documento.archivo_firmado.name))
+                    # Obtener el nombre base del archivo firmado o del original si no existe firmado
+                    archivo_original = documento.archivo_firmado if documento.archivo_firmado and documento.archivo_firmado.name else documento.archivo
+                    archivo_nombre = os.path.basename(archivo_original.name)  # Obtener el nombre del archivo sin la ruta
+                    
+                    # Construir la ruta del archivo firmado
+                    signed_pdf_path = os.path.join(output_dir, archivo_nombre)
+                    
+                    
                     with open(signed_pdf_path, "wb") as outputStream:
                         output.write(outputStream)
 

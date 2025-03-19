@@ -49,6 +49,7 @@ AREAS_OPCIONES = [
     ('ALMACEN', 'Almacén'),
     ('COORDINACION_GENERAL_FOCUS', 'Coordinación General Focus'),
     ('MARKETING_FOCUS', 'Área Marketing Focus'),
+    ('ADMINISTRACION_FOCUS', 'Administración Focus'),  # Nueva opción agregada
     ('PRACTICANTE', 'Practicante'),
     ('GERENCIA','Gerencia'),
     ('OPERATIVA','Operativa'),

@@ -42501,3 +42501,345 @@ Not Found: /robots.txt
 Not Found: /documentos/
 Not Found: /favicon.ico
 Not Found: /favicon.ico
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /documentos_firmados/informe-025-2025-completo_y7UGb5h.pdf
+Not Found: /documentos_firmados/fut-no-001-acumulacion-de-tiempo-por-evento_iSZoeCv.pdf
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /documentos/devolucion-de-horas-por-motivos-de-salud-13-03.pdf
+Not Found: /favicon.ico
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Not Found: /favicon.ico
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /documentos/devolucion-de-horas-por-motivos-de-salud-13-03.pdf
+Not Found: /documentos/devolucion-de-horas-por-motivos-de-salud-13-03.pdf
+Internal Server Error: /subir_documento/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2117, in get_prep_value
+    return int(value)
+           ^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'SimpleLazyObject'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 726, in subir_documento_view
+    rol_usuario = RolesUsuario.objects.get(user=request.user)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/query.py", line 635, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1559, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1389, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/lookups.py", line 30, in __init__
+    self.rhs = self.get_prep_lookup()
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/fields/related_lookups.py", line 156, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/db/models/fields/__init__.py", line 2119, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <SimpleLazyObject: <django.contrib.auth.models.AnonymousUser object at 0x7f9d48f63510>>.
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Not Found: /favicon.ico
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Internal Server Error: /usuario_home/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 619, in usuario_home_view
+    if rol_usuario:
+       ^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'rol_usuario' where it is not associated with a value
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Forbidden (CSRF token from POST incorrect.): /
+Rol del usuario: SECRETARIA
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /memos/MEMORANDUM_CIRCULAR_N_019-2025_COMPLETO.pdf
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Rol del usuario: SECRETARIA
+Rol del usuario: SECRETARIA
+Rol del usuario: USUARIO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /memos/MEMORANDUM_CIRCULAR_N_016-2025.pdf
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Internal Server Error: /aprobar_documento/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 893, in aprobar_documento
+    can.setFillColor(colors.green)
+                     ^^^^^^
+NameError: name 'colors' is not defined
+Internal Server Error: /aprobar_documento/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 893, in aprobar_documento
+    can.setFillColor(colors.green)
+                     ^^^^^^
+NameError: name 'colors' is not defined
+Valor de enviarOpcion: gerencia
+Firma digital encontrada: /home/egaturedu/public_html/gti/firmas/image-removebg-preview.png
+Valor de enviarOpcion: gerencia
+Firma digital encontrada: /home/egaturedu/public_html/gti/firmas/image-removebg-preview.png
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Internal Server Error: /aprobar_documento/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 900, in aprobar_documento
+    can.setFillColor(colors.green)
+                     ^^^^^^
+NameError: name 'colors' is not defined
+Rol del usuario: SECRETARIA
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Valor de enviarOpcion: gerencia
+Firma digital encontrada: /home/egaturedu/public_html/gti/firmas/image-removebg-preview.png
+Internal Server Error: /subir_documento/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 713, in subir_documento_view
+    documento.fecha_recepcion = now()
+                                ^^^
+NameError: name 'now' is not defined
+Internal Server Error: /gerente_home/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 194, in gerente_home
+    rol_usuario = request.user.roles.rol  # Acceso directo al rol del usuario
+                  ^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/utils/functional.py", line 253, in inner
+    return func(_wrapped, *args)
+           ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AnonymousUser' object has no attribute 'roles'
+Not Found: /favicon.ico
+Internal Server Error: /aprobar_documento/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 900, in aprobar_documento
+    can.setFillColor(colors.green)
+                     ^^^^^^
+NameError: name 'colors' is not defined
+Internal Server Error: /aprobar_documento/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 900, in aprobar_documento
+    can.setFillColor(colors.green)
+                     ^^^^^^
+NameError: name 'colors' is not defined
+Valor de enviarOpcion: gerencia
+Firma digital encontrada: /home/egaturedu/public_html/gti/firmas/image-removebg-preview.png
+Valor de enviarOpcion: gerencia
+Firma digital encontrada: /home/egaturedu/public_html/gti/firmas/image-removebg-preview.png
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Valor de enviarOpcion: gerencia
+Firma digital encontrada: /home/egaturedu/public_html/gti/firmas/image-removebg-preview.png
+Documento firmado guardado en: documentos_firmados/requerimiento-ndeg30-2025-of.pdf
+Rol del usuario: SECRETARIA
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Valor de enviarOpcion: gerencia
+Firma digital encontrada: /home/egaturedu/public_html/gti/firmas/image-removebg-preview.png
+Documento firmado guardado en: documentos_firmados/requerimiento-ndeg58-2025-agg.pdf
+Rol del usuario: USUARIO
+Estado del documento antes de firmar: APROBADO
+Estado del documento antes de firmar: APROBADO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Internal Server Error: /aprobar_documento_gerente/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 1048, in aprobar_documento_gerente
+    with open(signed_pdf_path, "wb") as outputStream:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IsADirectoryError: [Errno 21] Is a directory: 'documentos_firmados_gerente/'
+Internal Server Error: /aprobar_documento_gerente/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 1048, in aprobar_documento_gerente
+    with open(signed_pdf_path, "wb") as outputStream:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IsADirectoryError: [Errno 21] Is a directory: 'documentos_firmados_gerente/'
+Estado del documento antes de firmar: APROBADO
+Estado del documento antes de firmar: APROBADO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Internal Server Error: /aprobar_documento_gerente/
+Traceback (most recent call last):
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/virtualenv/public_html/gti/3.11/lib/python3.11/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/egaturedu/public_html/gti/myapp/views.py", line 1048, in aprobar_documento_gerente
+    with open(signed_pdf_path, "wb") as outputStream:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+IsADirectoryError: [Errno 21] Is a directory: 'documentos_firmados_gerente/'
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Estado del documento antes de firmar: APROBADO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Estado del documento antes de firmar: APROBADO
+Documento firmado guardado en: documentos_firmados_gerente/a4-tarjeta-cumpleanos-9.pdf
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Estado del documento antes de firmar: APROBADO
+Documento firmado guardado en: documentos_firmados_gerente/requerimiento-ndeg58-2025-agg_orEy7MU.pdf
+Rol del usuario: SECRETARIA
+Rol del usuario: USUARIO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Not Found: /favicon.ico
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+Rol del usuario: USUARIO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory
+Rol del usuario: USUARIO
+/usr/local/lsws/fcgi-bin/lswsgi_wrapper: line 9: /home/egaturedu/virtualenv/public_html/gti/3.11/bin/set_env_vars.py: No such file or directory

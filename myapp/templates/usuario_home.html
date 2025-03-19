@@ -151,15 +151,19 @@
         <div id="documentosPorRevisarSection" style="display: none;">
             {% include 'documentos_por_revisar.html' %}
         </div>
-    
+    {% if request.user.roles.area != "ADMINISTRACION_FOCUS" %}
         <!-- Botón para mostrar/ocultar historial de archivos -->
         <button id="toggleButtonHistorial" class="btn btn-success mb-3 collapse-btn">
             Historial de Archivos <i class="fas fa-chevron-down"></i>
         </button>
         <!-- Sección colapsable de Historial de Archivos -->
-        <div id="documentosHistorialSection" style="display: none;">
-            {% include 'documentos_historial.html' %}
-        </div>
+        
+            <div id="documentosHistorialSection" style="display: none;">
+                {% include 'documentos_historial.html' %}
+            </div>
+        {% endif %}
+        
+        
     {% endif %}
     <!-- Documentos por Rendir -->
     <div id="avisosDocumentosPorRendir">

@@ -1,6 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from .models import Documento, RolesUsuario, FirmaDigital, Memo,Formato  # Importamos Memo
+from django.contrib.auth.admin import UserAdmin
+
+class CustomUserAdmin(UserAdmin):
+    list_display = ('id', 'username', 'email', 'first_name', 'last_name', 'is_staff')  # Agrega el ID
+    search_fields = ('id', 'username', 'email')  # Permite buscar por ID también
+
+# Desregistrar el modelo User para modificarlo
+admin.site.unregister(User)
+# Registrar el modelo User con la nueva configuración
+admin.site.register(User, CustomUserAdmin)
 
 class DocumentoAdmin(admin.ModelAdmin):
     list_display = ('id', 'usuario', 'tipo', 'estado', 'fecha_emision', 'fecha_recepcion', 
